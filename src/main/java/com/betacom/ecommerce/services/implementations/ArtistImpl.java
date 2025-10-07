@@ -1,5 +1,7 @@
 package com.betacom.ecommerce.services.implementations;
 
+import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.betacom.ecommerce.dto.ArtistaDTO;
-import com.betacom.ecommerce.dto.FamigliaDTO;
 import com.betacom.ecommerce.models.Artist;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.repositories.IArtistRepository;
@@ -17,8 +18,6 @@ import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
 import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
-
-import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
 
 import lombok.extern.slf4j.Slf4j;
 

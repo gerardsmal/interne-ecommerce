@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.betacom.ecommerce.dto.FamigliaDTO;
-import com.betacom.ecommerce.dto.ProdottoDTO;
 import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
 import com.betacom.ecommerce.requests.FamigliaReq;
 import com.betacom.ecommerce.response.ResponseBase;

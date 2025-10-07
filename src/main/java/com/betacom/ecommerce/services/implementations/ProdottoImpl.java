@@ -70,15 +70,10 @@ public class ProdottoImpl implements IProdottoServices{
 		if (artist.isEmpty())
 			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 
-		Famiglia fam = null;
-		for (Famiglia it:artist.get().getFamiglia()) {
-			if (it.getId() == req.getIdFamiglia()) {
-				fam = it;
-				break;
-			}			
-		}
-		if (fam == null)	
-			throw new Exception(msgS.getMessaggio("prod_fam.incomp"));
+		Famiglia fam = artist.get().getFamiglia().stream()
+			    .filter(f -> f.getId() == req.getIdFamiglia())
+			    .findFirst()
+			    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
 
 		
 		Prodotto p = new Prodotto();
@@ -112,15 +107,13 @@ public class ProdottoImpl implements IProdottoServices{
 		}
 		
 		if (req.getIdFamiglia() != null) {
-			Famiglia fam = null;
-			for (Famiglia it:p.getArtista().getFamiglia()) {
-				if (it.getId() == req.getIdFamiglia()) {
-					fam = it;
-					break;
-				}			
-			}
-			if (fam == null)	
-				throw new Exception(msgS.getMessaggio("prod_fam.incomp"));
+			
+			Famiglia fam = p.getArtista().getFamiglia().stream()
+				    .filter(f -> f.getId() == req.getIdFamiglia())
+				    .findFirst()
+				    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
+
+			
 			p.setFamiglia(fam);
 		}
 		
@@ -170,6 +163,6 @@ public class ProdottoImpl implements IProdottoServices{
 	}
 
 	
-
+	
 
 }

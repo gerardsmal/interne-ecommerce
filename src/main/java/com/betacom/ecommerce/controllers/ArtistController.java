@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.betacom.ecommerce.dto.ArtistaDTO;
-import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
 import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
 import com.betacom.ecommerce.response.ResponseBase;
