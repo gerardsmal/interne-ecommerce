@@ -45,7 +45,7 @@ public class ArtistImpl implements IArtistServices{
 			throw new Exception(msgS.getMessaggio("artist_no_name"));
 		Optional<Artist> ar = artS.findByNome(req.getNome().trim());
 		if (ar.isPresent())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
+			throw new Exception(msgS.getMessaggio("artist_fnd"));
 			
 		Artist artist = new Artist();
 		artist.setNome(req.getNome().trim());
@@ -67,13 +67,13 @@ public class ArtistImpl implements IArtistServices{
 		log.debug("update:" + req);
 		Optional<Artist> ar = artS.findById(req.getId());
 		if (ar.isEmpty())
-			throw new Exception("Artiste non trovato");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 		
 		Artist artist = ar.get();
 		if (req.getNome() != null) {
 			Optional<Artist> pr = artS.findByNome(req.getNome().trim());
 			if (pr.isPresent())
-				throw new Exception("Artiste esiste in DB");
+				throw new Exception(msgS.getMessaggio("artist_fnd"));
 			artist.setNome(req.getNome().trim());
 		}
 	
@@ -87,7 +87,7 @@ public class ArtistImpl implements IArtistServices{
 		if (req.getIdFamiglia() != null) {
 			Optional<Famiglia> fam = famS.findById(req.getIdFamiglia());
 			if (fam.isEmpty())
-				throw new Exception("Famiglia non trovata");
+				throw new Exception(msgS.getMessaggio("fam_ntfnd"));
 			artist.getFamiglia().add(fam.get());			
 		}
 		
@@ -104,7 +104,7 @@ public class ArtistImpl implements IArtistServices{
 		log.debug("remove:" + req);
 		Optional<Artist> ar = artS.findById(req.getId());
 		if (ar.isEmpty())
-			throw new Exception("Artiste non trovato");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 		
 		int size = ar.get().getFamiglia().size(); 
 		
@@ -116,7 +116,7 @@ public class ArtistImpl implements IArtistServices{
 				);
 		
 		if (size == ar.get().getFamiglia().size())
-			throw new Exception("Famiglia non non trovata per l'artista");
+			throw new Exception(msgS.getMessaggio("artist-no-fam"));
 		
 		
 		artS.save(ar.get());
@@ -147,10 +147,10 @@ public class ArtistImpl implements IArtistServices{
 		Optional<Artist> ar = artS.findById(req.getId());
 		
 		if (ar.isEmpty())
-			throw new Exception("Artiste non trovato");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 	
 		if (!ar.get().getProdotto().isEmpty())
-			throw new Exception("Prodotto(i) associato all'artista");
+			throw new Exception(msgS.getMessaggio("artist-prod_fnd"));
 		artS.delete(ar.get());
 		
 	}
@@ -163,7 +163,7 @@ public class ArtistImpl implements IArtistServices{
 		
 		Optional<Artist> art = artS.findById(id);
 		if (art.isEmpty())
-			throw new Exception("Artiste non trovato");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 		
 		return ArtistaDTO.builder()
 				.id(art.get().getId())

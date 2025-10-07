@@ -1,5 +1,8 @@
 package com.betacom.ecommerce.services.implementations;
 
+import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
+import static com.betacom.ecommerce.utils.Utilities.buildPrezzoDTOList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +19,8 @@ import com.betacom.ecommerce.repositories.IArtistRepository;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.repositories.IProdottoRepository;
 import com.betacom.ecommerce.requests.ProdottoReq;
+import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IProdottoServices;
-
-import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,12 +31,17 @@ public class ProdottoImpl implements IProdottoServices{
 	private IProdottoRepository repP;
 	private IFamigliaRepository repF;
 	private IArtistRepository   artistR;
+	private IMessaggiServices   msgS;
 
 	
-	public ProdottoImpl(IProdottoRepository repP, IFamigliaRepository repF, IArtistRepository   artistR) {
+	public ProdottoImpl(IProdottoRepository repP, 
+			IFamigliaRepository repF, 
+			IArtistRepository   artistR,
+			IMessaggiServices   msgS) {
 		this.repP = repP;
 		this.repF = repF;
 		this.artistR = artistR;
+		this.msgS = msgS;
 	}
 
 
@@ -45,26 +52,23 @@ public class ProdottoImpl implements IProdottoServices{
 		log.debug("Begin create:" + req);
 		
 		if (req.getDescrizione() == null) {
-			throw new Exception("Descrizione non presente");
+			throw new Exception(msgS.getMessaggio("prod_no_desc"));
 		}
 		Optional<Prodotto> prod = repP.findByDescrizione(req.getDescrizione().trim());
 		if (prod.isPresent())
-			throw new Exception("Prodotto presente in DB");
+			throw new Exception(msgS.getMessaggio("prod_fnd"));
 		
-		if (req.getPrezzo() == null) {
-			throw new Exception("Prezzo non presente");
-		}
 		
 		if (req.getIdFamiglia() == null)
-			throw new Exception("Famiglia obbligatoria");
+			throw new Exception(msgS.getMessaggio("prod_no_famiglia"));
 
 		if (req.getIdArtist() == null)
-			throw new Exception("Artista obbligatoria");
+			throw new Exception(msgS.getMessaggio("prod_no_artist"));
 
 		
 		Optional<Artist> artist = artistR.findById(req.getIdArtist());
 		if (artist.isEmpty())
-			throw new Exception("Artista  non trovata in DB");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 
 		Famiglia fam = null;
 		for (Famiglia it:artist.get().getFamiglia()) {
@@ -74,12 +78,11 @@ public class ProdottoImpl implements IProdottoServices{
 			}			
 		}
 		if (fam == null)	
-			throw new Exception("Famiglia non compatibile con l'artista");
+			throw new Exception(msgS.getMessaggio("prod_fam.incomp"));
 
 		
 		Prodotto p = new Prodotto();
 		p.setDescrizione(req.getDescrizione().trim());
-//		p.setPrezzo(req.getPrezzo());
 		p.setFamiglia(fam);
 		p.setArtista(artist.get());
 		
@@ -93,22 +96,18 @@ public class ProdottoImpl implements IProdottoServices{
 		log.debug("Begin update:" + req);
 		Optional<Prodotto> prod = repP.findById(req.getId());
 		if (prod.isEmpty())
-			throw new Exception("prodotto non trovato in DB");
+			throw new Exception(msgS.getMessaggio("prod_ntfnd"));
 		
 		Prodotto p = prod.get();
 		
 		if (req.getDescrizione() != null) {
 			p.setDescrizione(req.getDescrizione().trim());
 		}
-		
-//		if (req.getPrezzo() != null) {
-//			p.setPrezzo(req.getPrezzo());
-//		}
-		
+				
 		if (req.getIdArtist() != null) {
 			Optional<Artist> artist = artistR.findById(req.getIdArtist());
 			if (artist.isEmpty())
-				throw new Exception("Artista  non trovata in DB");
+				throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 			p.setArtista(artist.get());			
 		}
 		
@@ -121,7 +120,7 @@ public class ProdottoImpl implements IProdottoServices{
 				}			
 			}
 			if (fam == null)	
-				throw new Exception("Famiglia non compatibile con l'artista");
+				throw new Exception(msgS.getMessaggio("prod_fam.incomp"));
 			p.setFamiglia(fam);
 		}
 		
@@ -134,7 +133,7 @@ public class ProdottoImpl implements IProdottoServices{
 		log.debug("Begin delete:" + req);
 		Optional<Prodotto> prod = repP.findById(req.getId());
 		if (prod.isEmpty())
-			throw new Exception("prodotto non trovato in DB");
+			throw new Exception(msgS.getMessaggio("prod_ntfnd"));
 		
 		
 		repP.delete(prod.get());
@@ -162,13 +161,15 @@ public class ProdottoImpl implements IProdottoServices{
 								.famiglia(buildFamigliaDTOList(p.getArtista().getFamiglia()))
 								.build()
 								)
-						.build())
+						.prezzo(buildPrezzoDTOList(p.getPrezzo()))
+						.build()
+						)
+						
 				.toList();
 		
 	}
 
 	
-
 
 
 }

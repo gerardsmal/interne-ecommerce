@@ -1,5 +1,7 @@
 package com.betacom.ecommerce.dto;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +13,7 @@ import lombok.Setter;
 public class ProdottoDTO {
 	private Integer id;
 	private String descrizione;
-	private Double prezzo;
 	private FamigliaDTO famiglia;
 	private ArtistaDTO artista;
+	private List<PrezzoDTO> prezzo;
 }

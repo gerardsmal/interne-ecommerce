@@ -13,6 +13,7 @@ import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.requests.FamigliaReq;
+import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IFamigliaServices;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class FamigliaImpl  implements IFamigliaServices{
 
 	private IFamigliaRepository repoF;
+	private IMessaggiServices msgS;
 	
 	
-	public FamigliaImpl(IFamigliaRepository repoF) {
+	public FamigliaImpl(IFamigliaRepository repoF, IMessaggiServices msgS) {
 		this.repoF = repoF;
+		this.msgS = msgS;
 	}
 
 	@Transactional (rollbackFor = Exception.class)
@@ -35,7 +38,7 @@ public class FamigliaImpl  implements IFamigliaServices{
 		
 		Optional<Famiglia> fam = repoF.findByDescrizione(req.getDescrizione().trim());
 		if (fam.isPresent()) {
-			throw new Exception("Famiglia presente in DB");
+			throw new Exception(msgS.getMessaggio("fam_fnd"));
 		}
 		Famiglia f = new Famiglia();
 		f.setDescrizione(req.getDescrizione().trim());
@@ -51,7 +54,7 @@ public class FamigliaImpl  implements IFamigliaServices{
 		
 		Optional<Famiglia> fam = repoF.findById(req.getId());
 		if (fam.isEmpty()) {
-			throw new Exception("Famiglia non presente in DB");
+			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
 		}
 		Famiglia f = fam.get();
 		
@@ -71,13 +74,13 @@ public class FamigliaImpl  implements IFamigliaServices{
 		
 		Optional<Famiglia> fam = repoF.findById(req.getId());
 		if (fam.isEmpty()) {
-			throw new Exception("Famiglia non presente in DB");
+			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
 		}
 		
 		try {
 			repoF.delete(fam.get());
 		} catch (Exception e) {
-			throw new Exception("Famiglia con figli attivi");
+			throw new Exception(msgS.getMessaggio("fam_children"));
 		}
 	}
 
@@ -114,7 +117,7 @@ public class FamigliaImpl  implements IFamigliaServices{
 		log.debug("Begin ListByIdProdottoFamiglia :" + id);
 		Optional<Famiglia> fam = repoF.findById(id);
 		if (fam.isEmpty()) {
-			throw new Exception("Famiglia non presente in DB");
+			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
 		}
 		
 		return  ProdottoFamigliaDTO.builder()
