@@ -129,7 +129,6 @@ public class FamigliaImpl  implements IFamigliaServices{
 				.map(p -> ProdottoDTO.builder()
 						.id(p.getId())
 						.descrizione(p.getDescrizione())
-						.prezzo(p.getPrezzo())
 						.famiglia(FamigliaDTO.builder()
 								.id(p.getFamiglia().getId())
 								.descrizione(p.getFamiglia().getDescrizione())

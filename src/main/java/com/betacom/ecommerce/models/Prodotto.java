@@ -1,12 +1,16 @@
 package com.betacom.ecommerce.models;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,16 +31,19 @@ public class Prodotto {
 			nullable = false)
 	private String descrizione;
 	
-	@Column (nullable = false)
-	private Double prezzo;
 	
-	@ManyToOne
-	@JoinColumn (name="id_artista")
+	@ManyToOne (optional = false)
+	@JoinColumn (name="id_artista" , nullable = false)
 	private Artist artista;
 	
-	@ManyToOne
-	@JoinColumn (name="id_famiglia")
+	@ManyToOne (optional = false)
+	@JoinColumn (name="id_famiglia" , nullable = false)
 	private Famiglia famiglia;
 	
+	@OneToMany(
+			mappedBy = "prodotto",
+			fetch = FetchType.EAGER)
+	
+	private List<Prezzo> prezzo;
 	
 }

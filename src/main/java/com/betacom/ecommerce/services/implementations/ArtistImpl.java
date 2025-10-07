@@ -15,21 +15,25 @@ import com.betacom.ecommerce.repositories.IArtistRepository;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
+import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
 
 import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class ArtistImpl implements IArtistServices{
 
 	private IArtistRepository artS;
 	private IFamigliaRepository famS;
+	private IMessaggiServices  msgS;
 	
-	public ArtistImpl(IArtistRepository artS, IFamigliaRepository famS) {
+	public ArtistImpl(IArtistRepository artS, IFamigliaRepository famS,IMessaggiServices  msgS) {
 		this.artS = artS;
 		this.famS = famS;
+		this.msgS = msgS;
 	}
 
 	
@@ -38,17 +42,17 @@ public class ArtistImpl implements IArtistServices{
 	public void create(ArtistReq req) throws Exception {
 		log.debug("create:" + req);
 		if (req.getNome() == null)
-			throw new Exception("Nome artiste obbligatorio");
+			throw new Exception(msgS.getMessaggio("artist_no_name"));
 		Optional<Artist> ar = artS.findByNome(req.getNome().trim());
 		if (ar.isPresent())
-			throw new Exception("Artiste esiste in DB");
+			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 			
 		Artist artist = new Artist();
 		artist.setNome(req.getNome().trim());
 		if (req.getIdFamiglia() != null) {
 			Optional<Famiglia> fam = famS.findById(req.getIdFamiglia());
 			if (fam.isEmpty())
-				throw new Exception("Famiglia non trovata");
+				throw new Exception(msgS.getMessaggio("fam_ntfnd"));
 			artist.setFamiglia(new ArrayList<>()); // init famiglia
 			artist.getFamiglia().add(fam.get());
 		}
@@ -136,6 +140,22 @@ public class ArtistImpl implements IArtistServices{
 
 	}
 
+	@Transactional (rollbackFor = Exception.class)
+	@Override
+	public void remove(ArtistReq req) throws Exception {
+		log.debug("remove:" + req);
+		Optional<Artist> ar = artS.findById(req.getId());
+		
+		if (ar.isEmpty())
+			throw new Exception("Artiste non trovato");
+	
+		if (!ar.get().getProdotto().isEmpty())
+			throw new Exception("Prodotto(i) associato all'artista");
+		artS.delete(ar.get());
+		
+	}
+
+
 
 	@Override
 	public ArtistaDTO listByArtista(Integer id) throws Exception {
@@ -150,6 +170,22 @@ public class ArtistImpl implements IArtistServices{
 				.nome(art.get().getNome())
 				.famiglia(buildFamigliaDTOList(art.get().getFamiglia()))
 				.build();
+	}
+
+
+	@Override
+	public List<ArtistaDTO> list() throws Exception {
+		log.debug("list");
+		List<Artist> lA = artS.findAll();
+
+		return lA.stream()
+				.map(art -> ArtistaDTO.builder()
+						.id(art.getId())
+						.nome(art.getNome())
+						.famiglia(buildFamigliaDTOList(art.getFamiglia()))
+						.build()
+						)
+				.toList();
 	}
 
 

@@ -14,6 +14,7 @@ import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
 import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
 import com.betacom.ecommerce.response.ResponseBase;
+import com.betacom.ecommerce.response.ResponseList;
 import com.betacom.ecommerce.response.ResponseObject;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
 
@@ -54,6 +55,22 @@ public class ArtistController {
 		
 		return r;
 	}
+
+	@DeleteMapping("/delete")
+	public ResponseBase delete(@RequestBody (required = true) ArtistReq req) {
+		ResponseBase r = new ResponseBase();
+		try {
+			artS.remove(req);
+			r.setRc(true);
+		} catch (Exception e) {
+			r.setRc(false);
+			r.setMsg(e.getMessage());
+		}
+		
+		return r;
+	}
+
+	
 	
 	@DeleteMapping("/removeFamiglia")
 	public ResponseBase removeFamiglia(@RequestBody (required = true) ArtistReq req) {
@@ -96,5 +113,18 @@ public class ArtistController {
 		}
 		return r;
 	}
-	
+
+	@GetMapping("/list")
+	public ResponseList<ArtistaDTO> list(){
+		ResponseList<ArtistaDTO> r = new ResponseList<ArtistaDTO>();
+		try {
+			r.setDati(artS.list());
+			r.setRc(true);
+		} catch (Exception e) {
+			r.setRc(false);
+			r.setMsg(e.getMessage());
+		}
+		return r;
+	}
+
 }

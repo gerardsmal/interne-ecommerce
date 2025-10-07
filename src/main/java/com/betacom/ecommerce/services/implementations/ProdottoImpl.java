@@ -55,19 +55,32 @@ public class ProdottoImpl implements IProdottoServices{
 			throw new Exception("Prezzo non presente");
 		}
 		
-		Optional<Famiglia> fam = repF.findById(req.getIdFamiglia());
-		if (fam.isEmpty()) {
-			throw new Exception("Famiglia non trovata in DB");
-		}
+		if (req.getIdFamiglia() == null)
+			throw new Exception("Famiglia obbligatoria");
+
+		if (req.getIdArtist() == null)
+			throw new Exception("Artista obbligatoria");
+
 		
 		Optional<Artist> artist = artistR.findById(req.getIdArtist());
 		if (artist.isEmpty())
 			throw new Exception("Artista  non trovata in DB");
+
+		Famiglia fam = null;
+		for (Famiglia it:artist.get().getFamiglia()) {
+			if (it.getId() == req.getIdFamiglia()) {
+				fam = it;
+				break;
+			}			
+		}
+		if (fam == null)	
+			throw new Exception("Famiglia non compatibile con l'artista");
+
 		
 		Prodotto p = new Prodotto();
 		p.setDescrizione(req.getDescrizione().trim());
-		p.setPrezzo(req.getPrezzo());
-		p.setFamiglia(fam.get());
+//		p.setPrezzo(req.getPrezzo());
+		p.setFamiglia(fam);
 		p.setArtista(artist.get());
 		
 		repP.save(p);
@@ -88,9 +101,9 @@ public class ProdottoImpl implements IProdottoServices{
 			p.setDescrizione(req.getDescrizione().trim());
 		}
 		
-		if (req.getPrezzo() != null) {
-			p.setPrezzo(req.getPrezzo());
-		}
+//		if (req.getPrezzo() != null) {
+//			p.setPrezzo(req.getPrezzo());
+//		}
 		
 		if (req.getIdArtist() != null) {
 			Optional<Artist> artist = artistR.findById(req.getIdArtist());
@@ -100,11 +113,16 @@ public class ProdottoImpl implements IProdottoServices{
 		}
 		
 		if (req.getIdFamiglia() != null) {
-			Optional<Famiglia> fam = repF.findById(req.getIdFamiglia());
-			if (fam.isEmpty()) {
-				throw new Exception("Famiglia non trovata in DB");
+			Famiglia fam = null;
+			for (Famiglia it:p.getArtista().getFamiglia()) {
+				if (it.getId() == req.getIdFamiglia()) {
+					fam = it;
+					break;
+				}			
 			}
-			p.setFamiglia(fam.get());
+			if (fam == null)	
+				throw new Exception("Famiglia non compatibile con l'artista");
+			p.setFamiglia(fam);
 		}
 		
 		repP.save(p);
@@ -134,7 +152,6 @@ public class ProdottoImpl implements IProdottoServices{
 				.map(p -> ProdottoDTO.builder()
 						.id(p.getId())
 						.descrizione(p.getDescrizione())
-						.prezzo(p.getPrezzo())
 						.famiglia(FamigliaDTO.builder()
 								.id(p.getFamiglia().getId())
 								.descrizione(p.getFamiglia().getDescrizione())
