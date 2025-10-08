@@ -33,11 +33,11 @@ public class CarelloImpl implements ICarelloServices{
 	@Override
 	public void create(CarelloReq req) throws Exception {
 		log.debug("create:" + req);
-		Optional<Account> ac = accountR.findById(req.getAccountID());
-		if (ac.isEmpty())
-			throw new Exception(msgS.getMessaggio("account_ntfnd"));
+		Account ac = accountR.findById(req.getAccountID())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("account_ntfnd")));
+		
 		Carello car = new Carello();
-		car.setAccount(ac.get());
+		car.setAccount(ac);
 		car.setDataCreazione(LocalDate.now());
 		
 		carR.save(car);

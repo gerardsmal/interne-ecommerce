@@ -40,20 +40,21 @@ public class AccountImpl implements IAccountServices{
 			throw new Exception(msgS.getMessaggio("account_no_nome"));
 		if (req.getCognome() == null)
 			throw new Exception(msgS.getMessaggio("account_no_cognome"));
-		if (req.getEmail() == null)
-			throw new Exception(msgS.getMessaggio("account_email_ko"));
-		if (!req.getEmail().trim().matches(emailRegex))
+		
+		if (req.getEmail() == null || !req.getEmail().trim().matches(emailRegex))
 			throw new Exception(msgS.getMessaggio("account_email_ko"));
 		if (req.getCommune() == null)
 			throw new Exception(msgS.getMessaggio("account_no_comune"));
 		if (req.getVia() == null)
 			throw new Exception(msgS.getMessaggio("account_no_via"));	
-		if (!req.getCap().trim().matches(capRegex))
-			throw new Exception(msgS.getMessaggio("account_cap_ko"));
-		if (req.getTelefono() != null) {
-			if (!req.getTelefono().trim().matches(telefonoRegex))
-				throw new Exception(msgS.getMessaggio("account_telefono_ko"));			
+
+		if (req.getCap() == null || !req.getCap().trim().matches(capRegex)) {
+		    throw new Exception(msgS.getMessaggio("account_cap_ko"));
 		}
+		
+		if (req.getTelefono() != null && !req.getTelefono().trim().matches(telefonoRegex))
+		    throw new Exception(msgS.getMessaggio("account_telefono_ko"));		
+		
 		if (req.getUserName() == null)
 			throw new Exception(msgS.getMessaggio("account_no_username"));	
 		if (req.getPwd() == null)
