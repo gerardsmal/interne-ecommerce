@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.betacom.ecommerce.dto.FamigliaDTO;
 import com.betacom.ecommerce.dto.PrezzoDTO;
+import com.betacom.ecommerce.dto.StockDTO;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prezzo;
 
@@ -24,6 +25,11 @@ public class Utilities {
 						.id(p.getId())
 						.supporto(p.getSupporto().toString())
 						.prezzo(p.getPrezzo())
+						.stock((p.getStock() == null) ? null : StockDTO.builder()
+								.id(p.getStock().getId())
+								.currentStock(p.getStock().getCurrentStock())
+								.stockAlert(p.getStock().getStockAlert())
+								.build())
 						.build())
 				.toList();
 	}

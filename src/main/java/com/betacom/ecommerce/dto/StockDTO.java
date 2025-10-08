@@ -7,10 +7,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class PrezzoDTO {
-	private Integer id;
-	private String supporto;
-	private Double prezzo;
-	private StockDTO stock;
+public class StockDTO {
 
+	private Integer id;
+	private Integer currentStock;
+	private Integer stockAlert;
 }

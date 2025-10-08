@@ -11,5 +11,5 @@ public interface IProdottoServices {
 	void update(ProdottoReq req) throws Exception;
 	void delete(ProdottoReq req) throws Exception;
 	
-	List<ProdottoDTO> list() throws Exception;
+	List<ProdottoDTO> list(Integer id, String desc, String artist, String famiglia) throws Exception;
 }

@@ -17,4 +17,12 @@ public interface IProdottoRepository extends JpaRepository<Prodotto, Integer>{
 	
 	@Query(name="prodotto.searchByDesc" )
 	List<Prodotto> searchByDescrizione(@Param("desc")  String desc);
+	
+	@Query(name="prodotto.searchByFilter" )
+	List<Prodotto> searchByFilter(
+			@Param("id") Integer id,
+			@Param("desc") String desc,
+			@Param("artist") String artist,
+			@Param("famiglia") String famiglia
+			);
 }

@@ -125,9 +125,9 @@ public class ProdottoImpl implements IProdottoServices{
 	
 
 	@Override
-	public List<ProdottoDTO> list() throws Exception {
-		log.debug("list");
-		List<Prodotto> lP = repP.findAll();
+	public List<ProdottoDTO> list(Integer id, String desc, String artist, String famiglia) throws Exception {
+		log.debug("list:" + id + "/" + desc);
+		List<Prodotto> lP = repP.searchByFilter(id, desc, artist, famiglia);
 		log.debug("prodotti trovati:" + lP.size());
 		return lP.stream()
 				.map(p -> ProdottoDTO.builder()
