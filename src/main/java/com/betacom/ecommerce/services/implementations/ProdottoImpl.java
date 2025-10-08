@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ProdottoImpl implements IProdottoServices{
 
 	private IProdottoRepository repP;
-	private IFamigliaRepository repF;
 	private IArtistRepository   artistR;
 	private IMessaggiServices   msgS;
 
@@ -39,7 +38,6 @@ public class ProdottoImpl implements IProdottoServices{
 			IArtistRepository   artistR,
 			IMessaggiServices   msgS) {
 		this.repP = repP;
-		this.repF = repF;
 		this.artistR = artistR;
 		this.msgS = msgS;
 	}
@@ -70,11 +68,7 @@ public class ProdottoImpl implements IProdottoServices{
 		if (artist.isEmpty())
 			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
 
-		Famiglia fam = artist.get().getFamiglia().stream()
-			    .filter(f -> f.getId() == req.getIdFamiglia())
-			    .findFirst()
-			    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
-
+		Famiglia fam = controlFamiglia(artist.get().getFamiglia(), req.getIdFamiglia());
 		
 		Prodotto p = new Prodotto();
 		p.setDescrizione(req.getDescrizione().trim());
@@ -108,13 +102,8 @@ public class ProdottoImpl implements IProdottoServices{
 		
 		if (req.getIdFamiglia() != null) {
 			
-			Famiglia fam = p.getArtista().getFamiglia().stream()
-				    .filter(f -> f.getId() == req.getIdFamiglia())
-				    .findFirst()
-				    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
+			p.setFamiglia(controlFamiglia(p.getArtista().getFamiglia(), req.getIdFamiglia()));
 
-			
-			p.setFamiglia(fam);
 		}
 		
 		repP.save(p);
@@ -161,8 +150,18 @@ public class ProdottoImpl implements IProdottoServices{
 				.toList();
 		
 	}
-
 	
+	/*
+	 * control family validity
+	 * family must be compatible with original artist family
+	 */
+	Famiglia controlFamiglia(List<Famiglia> lF, Integer idFamiglia) throws Exception{
+		Famiglia fam = lF.stream()
+			    .filter(f -> f.getId() == idFamiglia)
+			    .findFirst()
+			    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
+		return fam;
+	}
 	
 
 }
