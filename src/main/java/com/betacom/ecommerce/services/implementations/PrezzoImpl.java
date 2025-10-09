@@ -34,13 +34,11 @@ public class PrezzoImpl implements IPrezzoServices{
 	@Override
 	public void addPrezzo(PrezzoReq req) throws Exception {
 		log.debug("addPrezzo:" + req);
+		msgS.checkNotNull(req.getSupporto(), "prezzo_no_supporto");
 		
-		if (req.getSupporto() == null)
-			throw new Exception(msgS.getMessaggio("prezzo_no_supporto"));
 		
-		Optional<Prodotto> prod = prodR.findById(req.getIdProdotto());
-		if (prod.isEmpty())
-			throw new Exception(msgS.getMessaggio("prod_ntfnd"));
+		Prodotto prod = prodR.findById(req.getIdProdotto())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
 		
 		Supporto sup = null;
 		try {
@@ -59,12 +57,10 @@ public class PrezzoImpl implements IPrezzoServices{
 	
 		pr.setSupporto(Supporto.valueOf(req.getSupporto()));
 
-		if (req.getPrezzo() == null)
-			throw new Exception(msgS.getMessaggio("prod_no_prezzo"));
+		msgS.checkNotNull(req.getPrezzo(), "prod_no_prezzo");
 		
-		pr.setPrezzo(req.getPrezzo());
-		
-		pr.setProdotto(prod.get());
+		pr.setPrezzo(req.getPrezzo());	
+		pr.setProdotto(prod);
 		
 		prezzoR.save(pr);
 	}
@@ -74,11 +70,10 @@ public class PrezzoImpl implements IPrezzoServices{
 	public void removePrezzo(PrezzoReq req) throws Exception {
 		log.debug("addPrezzo:" + req);
 		
-		Optional<Prezzo> pr = prezzoR.findById(req.getId());
-		if (pr.isEmpty())
-			throw new Exception(msgS.getMessaggio("prezzo_ntfnd"));
+		Prezzo pr = prezzoR.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 		
-		prezzoR.delete(pr.get());
+		prezzoR.delete(pr);
 		
 	}
 	

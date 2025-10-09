@@ -1,28 +1,27 @@
 package com.betacom.ecommerce.models;
 
 import java.time.LocalDate;
-import java.util.List;
+
+import org.hibernate.annotations.Check;
+
+import com.betacom.ecommerce.utils.Supporto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-
-@Setter
 @Getter
+@Setter
 @Entity
-@Table (name="carello")
-public class Carello {
-
+@Table(name="riga_carello")
+public class RigaCarello {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -30,17 +29,16 @@ public class Carello {
 	@Column(name="data_creazione")
 	private LocalDate dataCreazione;
 	
-	@OneToOne
-	@JoinColumn(
-			name="account_id",
-			referencedColumnName = "id"
-			)
+	@ManyToOne
+	@JoinColumn (name="id_carello")	
+	private Carello carello;
 	
-	private Account account;
+	@ManyToOne
+	@JoinColumn (name="id_prodotto")
+	private Prodotto prodotto;
 	
-	@OneToMany(
-			mappedBy = "carello",
-			fetch = FetchType.EAGER
-			)
-	private  List<RigaCarello>  rigaCarello;
+	@Column (nullable = false)
+	@Check(constraints = "quantita > 0")
+	private Integer quantita;
+	private Supporto suppoorto;
 }

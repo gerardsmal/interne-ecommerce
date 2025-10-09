@@ -48,32 +48,24 @@ public class ProdottoImpl implements IProdottoServices{
 	public void create(ProdottoReq req) throws Exception {
 	
 		log.debug("Begin create:" + req);
-		
-		if (req.getDescrizione() == null) {
-			throw new Exception(msgS.getMessaggio("prod_no_desc"));
-		}
+		msgS.checkNotNull(req.getDescrizione(), "prod_no_desc");
+
 		Optional<Prodotto> prod = repP.findByDescrizione(req.getDescrizione().trim());
 		if (prod.isPresent())
 			throw new Exception(msgS.getMessaggio("prod_fnd"));
 		
+		msgS.checkNotNull(req.getIdFamiglia(), "prod_no_famiglia");
+		msgS.checkNotNull(req.getIdArtist(), "prod_no_artist");
 		
-		if (req.getIdFamiglia() == null)
-			throw new Exception(msgS.getMessaggio("prod_no_famiglia"));
-
-		if (req.getIdArtist() == null)
-			throw new Exception(msgS.getMessaggio("prod_no_artist"));
-
-		
-		Optional<Artist> artist = artistR.findById(req.getIdArtist());
-		if (artist.isEmpty())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
-
-		Famiglia fam = controlFamiglia(artist.get().getFamiglia(), req.getIdFamiglia());
+		Artist artist = artistR.findById(req.getIdArtist())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
+	
+		Famiglia fam = controlFamiglia(artist.getFamiglia(), req.getIdFamiglia());
 		
 		Prodotto p = new Prodotto();
 		p.setDescrizione(req.getDescrizione().trim());
 		p.setFamiglia(fam);
-		p.setArtista(artist.get());
+		p.setArtista(artist);
 		
 		repP.save(p);
 		
@@ -83,42 +75,35 @@ public class ProdottoImpl implements IProdottoServices{
 	@Override
 	public void update(ProdottoReq req) throws Exception {
 		log.debug("Begin update:" + req);
-		Optional<Prodotto> prod = repP.findById(req.getId());
-		if (prod.isEmpty())
-			throw new Exception(msgS.getMessaggio("prod_ntfnd"));
+		Prodotto prod = repP.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
 		
-		Prodotto p = prod.get();
 		
 		if (req.getDescrizione() != null) {
-			p.setDescrizione(req.getDescrizione().trim());
+			prod.setDescrizione(req.getDescrizione().trim());
 		}
 				
 		if (req.getIdArtist() != null) {
-			Optional<Artist> artist = artistR.findById(req.getIdArtist());
-			if (artist.isEmpty())
-				throw new Exception(msgS.getMessaggio("artist_ntfnd"));
-			p.setArtista(artist.get());			
+			Artist artist = artistR.findById(req.getIdArtist())
+					.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
+			prod.setArtista(artist);			
 		}
 		
 		if (req.getIdFamiglia() != null) {
-			
-			p.setFamiglia(controlFamiglia(p.getArtista().getFamiglia(), req.getIdFamiglia()));
-
+			prod.setFamiglia(controlFamiglia(prod.getArtista().getFamiglia(), req.getIdFamiglia()));
 		}
 		
-		repP.save(p);
+		repP.save(prod);
 	}
 
 	@Transactional (rollbackFor = Exception.class)
 	@Override
 	public void delete(ProdottoReq req) throws Exception {
 		log.debug("Begin delete:" + req);
-		Optional<Prodotto> prod = repP.findById(req.getId());
-		if (prod.isEmpty())
-			throw new Exception(msgS.getMessaggio("prod_ntfnd"));
+		Prodotto prod = repP.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
 		
-		
-		repP.delete(prod.get());
+		repP.delete(prod);
 		
 	}
 

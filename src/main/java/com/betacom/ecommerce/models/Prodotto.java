@@ -46,4 +46,9 @@ public class Prodotto {
 	
 	private List<Prezzo> prezzo;
 	
+	@OneToMany(
+			mappedBy = "prodotto",
+			fetch = FetchType.EAGER
+			)
+	private List<RigaCarello> rigaCarello;
 }

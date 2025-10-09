@@ -40,8 +40,8 @@ public class ArtistImpl implements IArtistServices{
 	@Override
 	public void create(ArtistReq req) throws Exception {
 		log.debug("create:" + req);
-		if (req.getNome() == null)
-			throw new Exception(msgS.getMessaggio("artist_no_name"));
+		msgS.checkNotNull(req.getNome(), "artist_no_name");
+		
 		Optional<Artist> ar = artS.findByNome(req.getNome().trim());
 		if (ar.isPresent())
 			throw new Exception(msgS.getMessaggio("artist_fnd"));
@@ -49,11 +49,10 @@ public class ArtistImpl implements IArtistServices{
 		Artist artist = new Artist();
 		artist.setNome(req.getNome().trim());
 		if (req.getIdFamiglia() != null) {
-			Optional<Famiglia> fam = famS.findById(req.getIdFamiglia());
-			if (fam.isEmpty())
-				throw new Exception(msgS.getMessaggio("fam_ntfnd"));
+			Famiglia fam = famS.findById(req.getIdFamiglia())
+					.orElseThrow(() -> new Exception(msgS.getMessaggio("fam_ntfnd")));
 			artist.setFamiglia(new ArrayList<>()); // init famiglia
-			artist.getFamiglia().add(fam.get());
+			artist.getFamiglia().add(fam);
 		}
 		
 		artS.save(artist);
@@ -143,14 +142,12 @@ public class ArtistImpl implements IArtistServices{
 	@Override
 	public void remove(ArtistReq req) throws Exception {
 		log.debug("remove:" + req);
-		Optional<Artist> ar = artS.findById(req.getId());
-		
-		if (ar.isEmpty())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
+		Artist ar = artS.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
 	
-		if (!ar.get().getProdotto().isEmpty())
+		if (!ar.getProdotto().isEmpty())
 			throw new Exception(msgS.getMessaggio("artist-prod_fnd"));
-		artS.delete(ar.get());
+		artS.delete(ar);
 		
 	}
 

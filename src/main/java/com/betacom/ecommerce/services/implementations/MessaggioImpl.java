@@ -38,5 +38,17 @@ public class MessaggioImpl implements IMessaggiServices{
 		
 		return r;
 	}
-
+	
+	@Override
+	public void validateWithRegex(String value, String regex, String msgKey) throws Exception {
+	    if (value == null || !value.trim().matches(regex)) {
+	        throw new Exception(getMessaggio(msgKey));
+	    }
+	}
+	@Override
+	public void checkNotNull(Object value, String messageKey) throws Exception {
+	    if (value == null || (value instanceof String s && s.trim().isEmpty())) {
+	        throw new Exception(getMessaggio(messageKey));
+	    }
+	}
 }

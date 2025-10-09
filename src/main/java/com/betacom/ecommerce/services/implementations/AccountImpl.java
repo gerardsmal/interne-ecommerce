@@ -3,11 +3,15 @@ package com.betacom.ecommerce.services.implementations;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.betacom.ecommerce.dto.SigninDTO;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.repositories.IAccountRepository;
 import com.betacom.ecommerce.requests.AccountReq;
+import com.betacom.ecommerce.requests.SigninReq;
 import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IAccountServices;
 import com.betacom.ecommerce.utils.Role;
@@ -20,14 +24,18 @@ public class AccountImpl implements IAccountServices{
 
 	private IAccountRepository accR;
 	private IMessaggiServices  msgS;
+	private PasswordEncoder    encoder;
 	
 	
-	public AccountImpl(IAccountRepository accR, IMessaggiServices msgS) {
+	public AccountImpl(IAccountRepository accR, 
+			IMessaggiServices msgS,
+			PasswordEncoder  encoder) {
 		this.accR = accR;
 		this.msgS = msgS;
+		this.encoder = encoder;
 	}
 
-
+	@Transactional (rollbackFor = Exception.class)
 	@Override
 	public void create(AccountReq req) throws Exception {
 		log.debug("create:" + req);
@@ -36,17 +44,14 @@ public class AccountImpl implements IAccountServices{
 		String capRegex = "^[0-9]{5}$";
 		String telefonoRegex = "^(\\+39)?\\s?(3\\d{2}|0\\d{1,3})\\s?\\d{5,10}$";
 
-		if (req.getNome() == null)
-			throw new Exception(msgS.getMessaggio("account_no_nome"));
-		if (req.getCognome() == null)
-			throw new Exception(msgS.getMessaggio("account_no_cognome"));
+		msgS.checkNotNull(req.getNome(), "account_no_nome");
+		msgS.checkNotNull(req.getCognome(), "account_no_cognome");
 		
 		if (req.getEmail() == null || !req.getEmail().trim().matches(emailRegex))
 			throw new Exception(msgS.getMessaggio("account_email_ko"));
-		if (req.getCommune() == null)
-			throw new Exception(msgS.getMessaggio("account_no_comune"));
-		if (req.getVia() == null)
-			throw new Exception(msgS.getMessaggio("account_no_via"));	
+
+		msgS.checkNotNull(req.getCommune(), "account_no_comune");
+		msgS.checkNotNull(req.getVia(), "account_no_via");
 
 		if (req.getCap() == null || !req.getCap().trim().matches(capRegex)) {
 		    throw new Exception(msgS.getMessaggio("account_cap_ko"));
@@ -54,13 +59,13 @@ public class AccountImpl implements IAccountServices{
 		
 		if (req.getTelefono() != null && !req.getTelefono().trim().matches(telefonoRegex))
 		    throw new Exception(msgS.getMessaggio("account_telefono_ko"));		
-		
-		if (req.getUserName() == null)
-			throw new Exception(msgS.getMessaggio("account_no_username"));	
-		if (req.getPwd() == null)
-			throw new Exception(msgS.getMessaggio("account_no_pwd"));	
+
+		msgS.checkNotNull(req.getUserName(), "account_no_username");
+		msgS.checkNotNull(req.getPwd(), "account_no_pwd");
+
+		Role role = null;
 		try {
-			Role role = Role.valueOf(req.getRole());
+			role = Role.valueOf(req.getRole());
 		} catch (IllegalArgumentException e) {
 			throw new Exception(msgS.getMessaggio("account_ruolo_ko"));	
 		}
@@ -79,16 +84,32 @@ public class AccountImpl implements IAccountServices{
 		acc.setCap(req.getCap());
 		acc.setTelefono(req.getTelefono());
 		acc.setUserName(req.getUserName());
-		acc.setPwd(req.getPwd());
-		acc.setRole(Role.valueOf(req.getRole()));
+		acc.setPwd(encoder.encode(req.getPwd()));  // encode password
+		acc.setRole(role);
 		acc.setDataCreazione(LocalDate.now());
 		
 		if (req.getSesso() == null) req.setSesso(true);
 		acc.setSesso(req.getSesso());
-		
-		
+		acc.setStatus(true);
 		accR.save(acc);
 		
+	}
+
+
+	@Override
+	public SigninDTO login(SigninReq req) throws Exception {
+		log.debug("login:" + req);
+		Account user = accR.findByUserName(req.getUserName())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("account_invalid")));
+		
+		if (!encoder.matches(req.getPassword(), user.getPwd()))
+			throw new Exception(msgS.getMessaggio("account_invalid"));
+		
+		
+		return SigninDTO.builder()
+				.userID(user.getId())
+				.role(user.getRole().toString())
+				.build();
 	}
 
 }

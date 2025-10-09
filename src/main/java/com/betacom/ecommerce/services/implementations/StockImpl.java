@@ -1,7 +1,5 @@
 package com.betacom.ecommerce.services.implementations;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +33,14 @@ public class StockImpl implements IStockServices{
 	@Override
 	public void update(StockReq req) throws Exception {
 		log.debug("update :" + req);
-		Optional<Prezzo> prez = prezzoR.findById(req.getPrezzoId());
-		if (prez.isEmpty())
-			throw new Exception(msgS.getMessaggio("prezzo_ntfnd"));
+		Prezzo prez = prezzoR.findById(req.getPrezzoId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
+		
 		Stock stock = null;
-		if (prez.get().getStock() == null) {
+		if (prez.getStock() == null) {
 			stock = new Stock();
 		} else {
-			stock = prez.get().getStock();
+			stock = prez.getStock();
 		}
 		if (req.getCurrentStock() != null)
 			stock.setCurrentStock(req.getCurrentStock());
@@ -60,26 +58,25 @@ public class StockImpl implements IStockServices{
 		stockR.save(stock);
 		log.debug("Stocke saved");
 		
-		prez.get().setStock(stock);	
+		prez.setStock(stock);	
 		
-		prezzoR.save(prez.get());		
+		prezzoR.save(prez);		
 	}
 
 	@Transactional (rollbackFor = Exception.class)
 	@Override
 	public void delete(StockReq req) throws Exception {
 		log.debug("delete :" + req);
-		Optional<Prezzo> prez = prezzoR.findById(req.getPrezzoId());
-		if (prez.isEmpty())
-			throw new Exception(msgS.getMessaggio("prezzo_ntfnd"));
+		Prezzo prez = prezzoR.findById(req.getPrezzoId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 
-		if (prez.get().getStock() == null) 
+		if (prez.getStock() == null) 
 			throw new Exception(msgS.getMessaggio("stock_ntfnd"));
 		
-		int id = prez.get().getStock().getId();
+		int id = prez.getStock().getId();
 		
-		prez.get().setStock(null);
-		prezzoR.save(prez.get());
+		prez.setStock(null);
+		prezzoR.save(prez);
 		log.debug("save prezzo");
 		
 		
@@ -91,14 +88,15 @@ public class StockImpl implements IStockServices{
 	public void pickItem(PickItemReq req) throws Exception {
 		log.debug("pickItem :" + req);
 
-		Optional<Prezzo> prez = prezzoR.findById(req.getPrezzoId());
-		if (prez.isEmpty())
-			throw new Exception(msgS.getMessaggio("prezzo_ntfnd"));
+		Prezzo prez = prezzoR.findById(req.getPrezzoId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 
-		if (prez.get().getStock() == null) 
+		msgS.checkNotNull(prez.getStock(), "stock_ntfnd");
+		/*
+		if (prez.getStock() == null) 
 			throw new Exception(msgS.getMessaggio("stock_ntfnd"));
-
-		Stock st = prez.get().getStock();
+		*/	
+		Stock st = prez.getStock();
 		
 		st.setCurrentStock(st.getCurrentStock() - req.getNumeroItems());
 		
@@ -106,6 +104,19 @@ public class StockImpl implements IStockServices{
 			throw new Exception(msgS.getMessaggio("stock_no_qta"));
 		stockR.save(st);
 		
+	}
+
+	@Override
+	public void restoreItem(PickItemReq req) throws Exception {
+		log.debug("restoreItem:" + req);
+		Prezzo prez = prezzoR.findById(req.getPrezzoId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
+		
+		msgS.checkNotNull(prez.getStock(), "stock_ntfnd");
+		Stock st = prez.getStock();
+		
+		st.setCurrentStock(st.getCurrentStock() + req.getNumeroItems());
+		stockR.save(st);
 	}
 
 }

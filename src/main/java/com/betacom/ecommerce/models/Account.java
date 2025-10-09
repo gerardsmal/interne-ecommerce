@@ -3,8 +3,6 @@ package com.betacom.ecommerce.models;
 
 import java.time.LocalDate;
 
-import org.hibernate.annotations.Cascade;
-
 import com.betacom.ecommerce.utils.Role;
 
 import jakarta.persistence.CascadeType;
@@ -73,10 +71,12 @@ public class Account {
 	
 	@Column (name="password",
 			  nullable = false,
-			  length = 50)	
+			  length = 255)	
 	private String pwd;
 	
 	private Role role;
+	
+	private Boolean status;  // true attivo false non attivo
 	
 	@Column (name="data_creazione")
 	private LocalDate dataCreazione;

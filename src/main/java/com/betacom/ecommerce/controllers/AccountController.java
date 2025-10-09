@@ -5,8 +5,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.betacom.ecommerce.dto.SigninDTO;
 import com.betacom.ecommerce.requests.AccountReq;
+import com.betacom.ecommerce.requests.SigninReq;
 import com.betacom.ecommerce.response.ResponseBase;
+import com.betacom.ecommerce.response.ResponseObject;
 import com.betacom.ecommerce.services.interfaces.IAccountServices;
 
 @RestController
@@ -33,5 +36,17 @@ public class AccountController {
 		return r;
 	}
 	
-	
+	@PostMapping("/login")
+	ResponseObject<SigninDTO> login (@RequestBody (required = true) SigninReq req){
+		ResponseObject<SigninDTO> r = new ResponseObject<SigninDTO>();
+		try {
+			r.setDati(accS.login(req));
+			r.setRc(true);
+		} catch (Exception e) {
+			r.setMsg(e.getMessage());
+			r.setRc(false);
+		}
+		return r;
+		
+	}
 }

@@ -52,16 +52,13 @@ public class FamigliaImpl  implements IFamigliaServices{
 	public void update(FamigliaReq req) throws Exception {
 		log.debug("Begin update:" + req);
 		
-		Optional<Famiglia> fam = repoF.findById(req.getId());
-		if (fam.isEmpty()) {
-			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
-		}
-		Famiglia f = fam.get();
+		Famiglia fam = repoF.findById(req.getId())
+				.orElseThrow(() ->new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
 		if (req.getDescrizione() != null) {
-			f.setDescrizione(req.getDescrizione().trim());
+			fam.setDescrizione(req.getDescrizione().trim());
 			
-			repoF.save(f);
+			repoF.save(fam);
 			
 		}
 		
@@ -72,13 +69,11 @@ public class FamigliaImpl  implements IFamigliaServices{
 	public void delete(FamigliaReq req) throws Exception {
 		log.debug("Begin delete:" + req);
 		
-		Optional<Famiglia> fam = repoF.findById(req.getId());
-		if (fam.isEmpty()) {
-			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
-		}
+		Famiglia fam = repoF.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
 		try {
-			repoF.delete(fam.get());
+			repoF.delete(fam);
 		} catch (Exception e) {
 			throw new Exception(msgS.getMessaggio("fam_children"));
 		}
