@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.betacom.ecommerce.enums.StatoCarello;
+import com.betacom.ecommerce.enums.Supporto;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Carello;
 import com.betacom.ecommerce.models.Prezzo;
@@ -21,9 +23,6 @@ import com.betacom.ecommerce.requests.RigaCarelloReq;
 import com.betacom.ecommerce.services.interfaces.ICarelloServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IStockServices;
-import com.betacom.ecommerce.utils.Supporto;
-
-
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,6 +62,7 @@ public class CarelloImpl implements ICarelloServices{
 		Carello car = new Carello();
 		car.setAccount(ac);
 		car.setDataCreazione(LocalDate.now());
+		car.setStato(StatoCarello.valueOf("carello"));
 		
 		carR.save(car);
 	}

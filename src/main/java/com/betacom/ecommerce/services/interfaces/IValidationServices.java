@@ -2,8 +2,8 @@ package com.betacom.ecommerce.services.interfaces;
 
 import java.util.List;
 
+import com.betacom.ecommerce.enums.Supporto;
 import com.betacom.ecommerce.models.Prezzo;
-import com.betacom.ecommerce.utils.Supporto;
 
 public interface IValidationServices {
 	String getMessaggio(String code);

@@ -1,5 +1,7 @@
 package com.betacom.ecommerce.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,31 +23,33 @@ public class PrezzoController {
 	}
 	
 	@PostMapping("/addPrezzo")
-	public ResponseBase create(@RequestBody (required = true) PrezzoReq req) {
+	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) PrezzoReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			prezzoS.addPrezzo(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	@DeleteMapping("/deletePrezzo")
-	public ResponseBase deletePrezzo(@RequestBody (required = true) PrezzoReq req) {
+	public ResponseEntity<ResponseBase> deletePrezzo(@RequestBody (required = true) PrezzoReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			prezzoS.removePrezzo(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 }

@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.betacom.ecommerce.enums.Role;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Prodotto;
-import com.betacom.ecommerce.utils.Role;
 
 public interface IAccountRepository extends JpaRepository<Account, Integer>{
 	Optional<Account> findByUserName(String user);

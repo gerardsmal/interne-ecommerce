@@ -1,4 +1,4 @@
-package com.betacom.ecommerce.utils;
+package com.betacom.ecommerce.enums;
 
 public enum Supporto {
 	CD,

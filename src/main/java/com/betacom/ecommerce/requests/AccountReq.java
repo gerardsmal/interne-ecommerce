@@ -8,8 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AccountReq {
-private Integer id;
-	
+	private Integer id;
 	private String nome;
 	private String cognome;
 	private String email;	
@@ -21,4 +20,5 @@ private Integer id;
 	private String userName;
 	private String pwd;	
 	private String role;
+	private Boolean status;
 }

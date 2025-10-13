@@ -1,5 +1,7 @@
 package com.betacom.ecommerce.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,102 +30,111 @@ public class ArtistController {
 	}
 
 	@PostMapping("/create")
-	public ResponseBase create(@RequestBody (required = true) ArtistReq req) {
+	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) ArtistReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.create(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	@PutMapping("/update")
-	public ResponseBase update(@RequestBody (required = true) ArtistReq req) {
+	public ResponseEntity<ResponseBase> update(@RequestBody (required = true) ArtistReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.update(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
-		}
-		
-		return r;
+			status = HttpStatus.BAD_REQUEST;
+		}		
+		return ResponseEntity.status(status).body(r);
 	}
 
 	@DeleteMapping("/delete")
-	public ResponseBase delete(@RequestBody (required = true) ArtistReq req) {
+	public ResponseEntity<ResponseBase> delete(@RequestBody (required = true) ArtistReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.remove(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 	
 	
 	@DeleteMapping("/removeFamiglia")
-	public ResponseBase removeFamiglia(@RequestBody (required = true) ArtistReq req) {
+	public ResponseEntity<ResponseBase> removeFamiglia(@RequestBody (required = true) ArtistReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.removeFamigliaArtist(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
-		}
-		
-		return r;
+			status = HttpStatus.BAD_REQUEST;
+		}	
+		return ResponseEntity.status(status).body(r);
 	}
 
 	
 	@PutMapping("/changeFamily")
-	public ResponseBase changeFamily(@RequestBody (required = true) ChangeFamilyReq req) {
+	public ResponseEntity<ResponseBase> changeFamily(@RequestBody (required = true) ChangeFamilyReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.changeFamily(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	@GetMapping("/listArtistbyId")
-	public ResponseObject<ArtistaDTO> listArtistbyId(@RequestParam (required = true) Integer id){
+	public ResponseEntity<ResponseObject<ArtistaDTO>> listArtistbyId(@RequestParam (required = true) Integer id){
 		ResponseObject<ArtistaDTO> r = new ResponseObject<ArtistaDTO>();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			r.setDati(artS.listByArtista(id));
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 	@GetMapping("/list")
-	public ResponseList<ArtistaDTO> list(){
+	public ResponseEntity<ResponseList<ArtistaDTO>> list(){
 		ResponseList<ArtistaDTO> r = new ResponseList<ArtistaDTO>();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			r.setDati(artS.list());
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 }

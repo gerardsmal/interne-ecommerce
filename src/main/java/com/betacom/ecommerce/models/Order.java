@@ -3,7 +3,7 @@ package com.betacom.ecommerce.models;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.betacom.ecommerce.enums.StatoCarello;
+import com.betacom.ecommerce.enums.StatusPagamento;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,42 +12,38 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-
-@Setter
 @Getter
+@Setter
 @Entity
-@Table (name="carello")
-public class Carello {
+@Table(name="ordini")
+public class Order {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@Column(name="data_creazione")
-	private LocalDate dataCreazione;
-
+	@Column(name="data_ordine")
+	private LocalDate dataOrdine;
 	
-	@Column (name="stato_carello")
-	private StatoCarello stato;
+	@Column (name="stato_pagamenti")
+	private StatusPagamento statusPagamento;
 	
-
+	@Column (name="totale_ordine")
+	private Double totale;
 	
-	@OneToOne
-	@JoinColumn(
-			name="account_id",
-			referencedColumnName = "id"
-			)
+	@ManyToOne
+	@JoinColumn (name="id_account")
 	private Account account;
 	
 	@OneToMany(
-			mappedBy = "carello",
+			mappedBy = "order",
 			fetch = FetchType.EAGER
 			)
-	private  List<RigaCarello>  rigaCarello;
+	private List<OrderItems> orderItems;
 }

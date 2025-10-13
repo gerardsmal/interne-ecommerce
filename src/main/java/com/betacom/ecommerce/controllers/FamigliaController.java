@@ -1,5 +1,7 @@
 package com.betacom.ecommerce.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,85 +31,94 @@ public class FamigliaController {
 
 	
 	@PostMapping("/create")
-	public ResponseBase create(@RequestBody (required = true) FamigliaReq req) {
+	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) FamigliaReq req) {
 		ResponseBase r = new ResponseBase(); 
+		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.create(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 	@PutMapping("/update")
-	public ResponseBase update(@RequestBody (required = true) FamigliaReq req) {
+	public ResponseEntity<ResponseBase> update(@RequestBody (required = true) FamigliaReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.update(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 
 	@DeleteMapping("/delete")
-	public ResponseBase delete(@RequestBody (required = true) FamigliaReq req) {
+	public ResponseEntity<ResponseBase> delete(@RequestBody (required = true) FamigliaReq req) {
 		ResponseBase r = new ResponseBase();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.delete(req);
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	@GetMapping("/list")
-	public ResponseList<FamigliaDTO> list(){
+	public ResponseEntity<ResponseList<FamigliaDTO>> list(){
 		ResponseList<FamigliaDTO> r = new ResponseList<FamigliaDTO>();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			r.setDati(famS.list());
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	@GetMapping("/listByProduct")
-	public ResponseList<ProdottoFamigliaDTO> listByProduct(){
+	public ResponseEntity<ResponseList<ProdottoFamigliaDTO>> listByProduct(){
 		ResponseList<ProdottoFamigliaDTO> r = new ResponseList<ProdottoFamigliaDTO>();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			r.setDati(famS.listPerFamiglia());
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 
 	@GetMapping("/listProductbyId")
-	public ResponseObject<ProdottoFamigliaDTO> listProductbyId(@RequestParam (required = true) Integer id){
+	public ResponseEntity<ResponseObject<ProdottoFamigliaDTO>> listProductbyId(@RequestParam (required = true) Integer id){
 		ResponseObject<ProdottoFamigliaDTO> r = new ResponseObject<ProdottoFamigliaDTO>();
+		HttpStatus status = HttpStatus.OK;
 		try {
 			r.setDati(famS.ListByIdProdottoFamiglia(id));
 			r.setRc(true);
 		} catch (Exception e) {
 			r.setRc(false);
 			r.setMsg(e.getMessage());
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return r;
+		return ResponseEntity.status(status).body(r);
 	}
 	
 	

@@ -1,6 +1,6 @@
 package com.betacom.ecommerce.models;
 
-import com.betacom.ecommerce.utils.Supporto;
+import com.betacom.ecommerce.enums.Supporto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

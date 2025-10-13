@@ -12,6 +12,8 @@ import com.betacom.ecommerce.requests.SigninReq;
 public interface IAccountServices {
 
 	void create (AccountReq req) throws  Exception;
+	void update (AccountReq req) throws  Exception;
+
 	SigninDTO login(SigninReq req) throws Exception;
 	
 	List<AccountDTO> list(

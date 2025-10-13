@@ -13,6 +13,7 @@ import com.betacom.ecommerce.dto.AccountDTO;
 import com.betacom.ecommerce.dto.CarelloDTO;
 import com.betacom.ecommerce.dto.CarelloRigaDTO;
 import com.betacom.ecommerce.dto.SigninDTO;
+import com.betacom.ecommerce.enums.Role;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.models.RigaCarello;
@@ -21,7 +22,6 @@ import com.betacom.ecommerce.requests.AccountReq;
 import com.betacom.ecommerce.requests.SigninReq;
 import com.betacom.ecommerce.services.interfaces.IAccountServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
-import com.betacom.ecommerce.utils.Role;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,6 +94,62 @@ public class AccountImpl implements IAccountServices{
 		acc.setSesso(req.getSesso());
 		acc.setStatus(true);
 		accR.save(acc);
+		
+	}
+
+	@Override
+	public void update(AccountReq req) throws Exception {
+		log.debug("update:" + req);
+		Account acc = accR.findById(req.getId())
+				.orElseThrow(() -> new Exception(validS.getMessaggio("account_ntfnd")));
+
+		if (req.getNome() != null) acc.setNome(req.getNome());
+		if (req.getCognome() != null)   acc.setCognome(req.getCognome());
+		if (req.getEmail() != null) {
+			validS.validateWithRegex(req.getEmail(), emailRegex, "account_email_ko");
+			acc.setEmail(req.getEmail());					
+		}
+		
+		if (req.getCommune() != null) acc.setCommune(req.getCommune());
+		if (req.getVia() != null) acc.setVia(req.getVia());
+		if (req.getCap() != null) {
+			validS.validateWithRegex(req.getCap(), capRegex, "account_cap_ko");
+			acc.setCap(req.getCap());
+		}
+		if (req.getTelefono() != null) {
+			validS.validateWithRegex(req.getTelefono(), telefonoRegex, "account_telefono_ko");
+			acc.setTelefono(req.getTelefono());
+		}
+		if (req.getUserName() != null) {
+			if (!req.getUserName().equalsIgnoreCase(acc.getUserName())) {
+				Optional<Account> a = accR.findByUserName(req.getUserName());
+				if (a.isPresent())
+					throw new Exception(validS.getMessaggio("account_username_ko"));	
+				acc.setUserName(req.getUserName());				
+			}
+			
+		}
+		if (req.getPwd() != null) {
+			validS.validatePassword(req.getPwd());		
+			acc.setPwd(encoder.encode(req.getPwd()));  // encode password
+		}
+		
+		if (req.getRole() != null) {
+			Role role = null;
+			try {
+				role = Role.valueOf((req.getRole() == null) ? "error" : req.getRole());
+			} catch (IllegalArgumentException e) {
+				throw new Exception(validS.getMessaggio("account_ruolo_ko"));	
+			}
+			acc.setRole(role);
+		}
+		if (req.getSesso() != null) acc.setSesso(req.getSesso());
+		
+		if (req.getStatus() != null) acc.setStatus(req.getStatus());
+		
+		accR.save(acc);
+		
+
 		
 	}
 
@@ -184,5 +240,6 @@ public class AccountImpl implements IAccountServices{
 			return null;
 		}	
 	}
+
 
 }

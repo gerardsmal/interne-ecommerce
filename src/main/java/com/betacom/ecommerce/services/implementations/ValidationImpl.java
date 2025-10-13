@@ -6,12 +6,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.betacom.ecommerce.enums.Supporto;
 import com.betacom.ecommerce.models.MessageID;
 import com.betacom.ecommerce.models.Messaggi;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.repositories.IMessaggiRepository;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
-import com.betacom.ecommerce.utils.Supporto;
 
 import lombok.extern.slf4j.Slf4j;
 

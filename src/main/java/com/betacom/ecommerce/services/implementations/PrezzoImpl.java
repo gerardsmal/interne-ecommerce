@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.betacom.ecommerce.enums.Supporto;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IPrezzoRepository;
@@ -12,8 +13,6 @@ import com.betacom.ecommerce.repositories.IProdottoRepository;
 import com.betacom.ecommerce.requests.PrezzoReq;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IPrezzoServices;
-import com.betacom.ecommerce.utils.Supporto;
-
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
