@@ -19,7 +19,7 @@ import com.betacom.ecommerce.repositories.IArtistRepository;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.repositories.IProdottoRepository;
 import com.betacom.ecommerce.requests.ProdottoReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IProdottoServices;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +30,13 @@ public class ProdottoImpl implements IProdottoServices{
 
 	private IProdottoRepository repP;
 	private IArtistRepository   artistR;
-	private IMessaggiServices   msgS;
+	private IValidationServices   msgS;
 
 	
 	public ProdottoImpl(IProdottoRepository repP, 
 			IFamigliaRepository repF, 
 			IArtistRepository   artistR,
-			IMessaggiServices   msgS) {
+			IValidationServices   msgS) {
 		this.repP = repP;
 		this.artistR = artistR;
 		this.msgS = msgS;

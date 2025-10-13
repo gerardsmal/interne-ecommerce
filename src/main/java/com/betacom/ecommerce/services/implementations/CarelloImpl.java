@@ -18,10 +18,12 @@ import com.betacom.ecommerce.repositories.IRigaCarelloRepository;
 import com.betacom.ecommerce.requests.CarelloReq;
 import com.betacom.ecommerce.requests.PickItemReq;
 import com.betacom.ecommerce.requests.RigaCarelloReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.ICarelloServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IStockServices;
 import com.betacom.ecommerce.utils.Supporto;
+
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,14 +33,14 @@ public class CarelloImpl implements ICarelloServices{
 	
 	private ICarelloRepository carR;
 	private IAccountRepository accountR;
-	private IMessaggiServices  msgS;
+	private IValidationServices  msgS;
 	private IProdottoRepository prodR;
 	private IRigaCarelloRepository rigaR;
 	private IStockServices stockS;
 	
 	public CarelloImpl(ICarelloRepository carR, 
 			IAccountRepository accountR, 
-			IMessaggiServices msgS, 
+			IValidationServices msgS, 
 			IProdottoRepository prodR,
 			IRigaCarelloRepository rigaR,
 			IStockServices stockS) {
@@ -80,23 +82,25 @@ public class CarelloImpl implements ICarelloServices{
 		
 		Supporto sup = buildSupporto(req.getSupporto());
 		
-		Prezzo prezzo = searchSupporto(prodotto.getPrezzo(), sup);
+		Prezzo prezzo = msgS.searchSupporto(prodotto.getPrezzo(), sup);
 				
 		RigaCarello riga = new RigaCarello();
 		riga.setDataCreazione(LocalDate.now());
 		riga.setQuantita(req.getQuantita());
 		riga.setCarello(carello);
 		riga.setProdotto(prodotto);
-		riga.setSuppoorto(sup);
+		riga.setSupporto(sup);
 		log.debug("Riga added...");
 		
-		stockS.pickItem(PickItemReq.builder()
-				.prezzoId(prezzo.getId())
-				.numeroItems(req.getQuantita())
-				.build()
-				);
-		
-		log.debug("Stock updated...");
+		if (prezzo.getStock() != null ) {
+			stockS.pickItem(PickItemReq.builder()
+					.prezzoId(prezzo.getId())
+					.numeroItems(req.getQuantita())
+					.build()
+					);
+			
+			log.debug("Stock updated...");			
+		}
 		rigaR.save(riga);
 		
 	}
@@ -108,28 +112,21 @@ public class CarelloImpl implements ICarelloServices{
 		RigaCarello riga =  rigaR.findById(req.getId())
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("carello_elem_ko")));
 
-		Prezzo prezzo = searchSupporto(riga.getProdotto().getPrezzo(), riga.getSuppoorto());
+		Prezzo prezzo = msgS.searchSupporto(riga.getProdotto().getPrezzo(), riga.getSupporto());
 
-		stockS.restoreItem(PickItemReq.builder()
-				.prezzoId(prezzo.getId())
-				.numeroItems(riga.getQuantita())
-				.build()
-				);
-		
-		log.debug("Stock updated...");
+		if (prezzo.getStock() != null) {
+			stockS.restoreItem(PickItemReq.builder()
+					.prezzoId(prezzo.getId())
+					.numeroItems(riga.getQuantita())
+					.build()
+					);
+			
+			log.debug("Stock updated...");
+			
+		}
 		
 		rigaR.delete(riga);
 		
-	}
-	/*
-	 * questo metodo search l'element prezzo giusto che corisponde al supporto
-	 * se non lo trova lancia un exception
-	 */
-	private Prezzo searchSupporto(List<Prezzo> prezzi, Supporto sup) throws Exception {
-	    return prezzi.stream()
-	            .filter(p -> p.getSupporto() == sup)
-	            .findFirst()
-	            .orElseThrow(() -> new Exception(msgS.getMessaggio("carello_supporto_ko")));
 	}
 	
 	/*

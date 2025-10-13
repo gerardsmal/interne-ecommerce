@@ -13,8 +13,8 @@ import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.requests.FamigliaReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IFamigliaServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,10 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 public class FamigliaImpl  implements IFamigliaServices{
 
 	private IFamigliaRepository repoF;
-	private IMessaggiServices msgS;
+	private IValidationServices msgS;
 	
 	
-	public FamigliaImpl(IFamigliaRepository repoF, IMessaggiServices msgS) {
+	public FamigliaImpl(IFamigliaRepository repoF, IValidationServices msgS) {
 		this.repoF = repoF;
 		this.msgS = msgS;
 	}

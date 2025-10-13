@@ -40,5 +40,5 @@ public class RigaCarello {
 	@Column (nullable = false)
 	@Check(constraints = "quantita > 0")
 	private Integer quantita;
-	private Supporto suppoorto;
+	private Supporto supporto;
 }

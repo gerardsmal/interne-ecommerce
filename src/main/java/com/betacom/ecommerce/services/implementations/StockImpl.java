@@ -9,7 +9,7 @@ import com.betacom.ecommerce.repositories.IPrezzoRepository;
 import com.betacom.ecommerce.repositories.IStockRepositoy;
 import com.betacom.ecommerce.requests.PickItemReq;
 import com.betacom.ecommerce.requests.StockReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IStockServices;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 public class StockImpl implements IStockServices{
 	private IStockRepositoy stockR;
 	private IPrezzoRepository prezzoR;
-	private IMessaggiServices msgS;
+	private IValidationServices msgS;
 	
 	
-	public StockImpl(IStockRepositoy stockR, IPrezzoRepository prezzoR, IMessaggiServices msgS) {
+	public StockImpl(IStockRepositoy stockR, IPrezzoRepository prezzoR, IValidationServices msgS) {
 		super();
 		this.stockR = stockR;
 		this.prezzoR = prezzoR;

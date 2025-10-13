@@ -16,8 +16,8 @@ import com.betacom.ecommerce.repositories.IArtistRepository;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
 import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,9 +27,9 @@ public class ArtistImpl implements IArtistServices{
 
 	private IArtistRepository artS;
 	private IFamigliaRepository famS;
-	private IMessaggiServices  msgS;
+	private IValidationServices  msgS;
 	
-	public ArtistImpl(IArtistRepository artS, IFamigliaRepository famS,IMessaggiServices  msgS) {
+	public ArtistImpl(IArtistRepository artS, IFamigliaRepository famS,IValidationServices  msgS) {
 		this.artS = artS;
 		this.famS = famS;
 		this.msgS = msgS;

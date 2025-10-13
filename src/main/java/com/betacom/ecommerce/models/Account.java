@@ -42,7 +42,7 @@ public class Account {
 			  length = 100)
 	private String email;
 	
-	private Boolean sesso; // true mas. false fem)
+	private Boolean sesso; // true masc. false fem)
 
 	@Column (name="numero_telefono",
 			  length = 15)

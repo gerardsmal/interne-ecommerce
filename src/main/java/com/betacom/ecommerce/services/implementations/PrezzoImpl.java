@@ -10,9 +10,10 @@ import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IPrezzoRepository;
 import com.betacom.ecommerce.repositories.IProdottoRepository;
 import com.betacom.ecommerce.requests.PrezzoReq;
-import com.betacom.ecommerce.services.IMessaggiServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IPrezzoServices;
 import com.betacom.ecommerce.utils.Supporto;
+
 
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
@@ -21,10 +22,10 @@ public class PrezzoImpl implements IPrezzoServices{
 
 	private IPrezzoRepository prezzoR;
 	private IProdottoRepository prodR;
-	private IMessaggiServices   msgS;
+	private IValidationServices   msgS;
 	
 	
-	public PrezzoImpl(IPrezzoRepository prezzoR, IProdottoRepository prodR, IMessaggiServices   msgS) {
+	public PrezzoImpl(IPrezzoRepository prezzoR, IProdottoRepository prodR, IValidationServices   msgS) {
 		this.prezzoR = prezzoR;
 		this.prodR = prodR;
 		this.msgS  = msgS;
@@ -48,13 +49,13 @@ public class PrezzoImpl implements IPrezzoServices{
 		}
 		
 		Prezzo pr = null;
-		Optional<Prezzo> prez = prezzoR.findBySupporto(sup);
-		if (prez.isPresent()) {
-			pr = prez.get();
-		} else {
+		
+		try {
+			pr = msgS.searchSupporto(prod.getPrezzo(), sup);			
+		} catch (Exception e) {  // if support no exist
 			pr = new Prezzo();
 		}
-	
+
 		pr.setSupporto(Supporto.valueOf(req.getSupporto()));
 
 		msgS.checkNotNull(req.getPrezzo(), "prod_no_prezzo");
