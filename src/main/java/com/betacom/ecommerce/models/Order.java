@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.betacom.ecommerce.enums.StatusPagamento;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,6 +31,10 @@ public class Order {
 	
 	@Column(name="data_ordine")
 	private LocalDate dataOrdine;
+
+	@Column(name="data_invio")
+	private LocalDate dataInvio;
+
 	
 	@Column (name="stato_pagamenti")
 	private StatusPagamento statusPagamento;
@@ -43,6 +48,7 @@ public class Order {
 	
 	@OneToMany(
 			mappedBy = "order",
+			cascade = CascadeType.REMOVE, orphanRemoval = true,
 			fetch = FetchType.EAGER
 			)
 	private List<OrderItems> orderItems;

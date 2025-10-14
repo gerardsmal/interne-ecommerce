@@ -221,6 +221,7 @@ public class AccountImpl implements IAccountServices{
 				total = total + (prezzo.getPrezzo() * riga.getQuantita());
 				rigaCar.add(
 						CarelloRigaDTO.builder()
+							.id(riga.getId())
 							.dataCreazione(riga.getDataCreazione())
 							.artist(riga.getProdotto().getArtista().getNome())
 							.productName(riga.getProdotto().getDescrizione())
@@ -232,6 +233,8 @@ public class AccountImpl implements IAccountServices{
 						);
 			}
 			return CarelloDTO.builder()
+					.id(account.getCarello().getId())
+					.status(account.getCarello().getStato().toString())
 					.prezzoTotale(total)
 					.riga(rigaCar)
 					.build();

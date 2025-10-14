@@ -9,7 +9,6 @@ import lombok.ToString;
 @ToString
 public class OrderReq {
 	private Integer id;
-	private String statusPagamento;
 	private Integer accountID;
 
 }

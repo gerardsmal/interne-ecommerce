@@ -32,21 +32,21 @@ public class CarelloImpl implements ICarelloServices{
 	
 	private ICarelloRepository carR;
 	private IAccountRepository accountR;
-	private IValidationServices  msgS;
+	private IValidationServices  validS;
 	private IProdottoRepository prodR;
 	private IRigaCarelloRepository rigaR;
 	private IStockServices stockS;
 	
 	public CarelloImpl(ICarelloRepository carR, 
 			IAccountRepository accountR, 
-			IValidationServices msgS, 
+			IValidationServices validS, 
 			IProdottoRepository prodR,
 			IRigaCarelloRepository rigaR,
 			IStockServices stockS) {
 		super();
 		this.carR = carR;
 		this.accountR = accountR;
-		this.msgS = msgS;
+		this.validS = validS;
 		this.prodR = prodR;
 		this.rigaR = rigaR;
 		this.stockS = stockS;
@@ -57,7 +57,10 @@ public class CarelloImpl implements ICarelloServices{
 	public void create(CarelloReq req) throws Exception {
 		log.debug("create:" + req);
 		Account ac = accountR.findById(req.getAccountID())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("account_ntfnd")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("account_ntfnd")));
+		
+		if (ac.getCarello()!= null)
+				throw new Exception(validS.getMessaggio("carello_exist"));
 		
 		Carello car = new Carello();
 		car.setAccount(ac);
@@ -72,17 +75,21 @@ public class CarelloImpl implements ICarelloServices{
 	public void addRiga(RigaCarelloReq req) throws Exception {
 		log.debug("addRiga:" + req);
 		Carello carello = carR.findById(req.getIdCarello())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("carello_ntfnd")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("carello_ntfnd")));
+		
+		if (carello.getStato() == StatoCarello.valueOf("ordine"))
+			throw new Exception(validS.getMessaggio("carello_not_available"));
+
 		
 		Prodotto prodotto = prodR.findById(req.getIdProdotto())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("prod_ntfnd")));
 		
 		if (req.getQuantita() == null || req.getQuantita() <= 0)
-			throw new Exception(msgS.getMessaggio("carello_quantita_ko"));
+			throw new Exception(validS.getMessaggio("carello_quantita_ko"));
 		
 		Supporto sup = buildSupporto(req.getSupporto());
 		
-		Prezzo prezzo = msgS.searchSupporto(prodotto.getPrezzo(), sup);
+		Prezzo prezzo = validS.searchSupporto(prodotto.getPrezzo(), sup);
 				
 		RigaCarello riga = new RigaCarello();
 		riga.setDataCreazione(LocalDate.now());
@@ -110,9 +117,13 @@ public class CarelloImpl implements ICarelloServices{
 	public void removeRiga(RigaCarelloReq req) throws Exception {
 		log.debug("removeRiga:" + req);
 		RigaCarello riga =  rigaR.findById(req.getId())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("carello_elem_ko")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("carello_elem_ko")));
 
-		Prezzo prezzo = msgS.searchSupporto(riga.getProdotto().getPrezzo(), riga.getSupporto());
+		if (riga.getCarello().getStato() == StatoCarello.valueOf("ordine"))
+			throw new Exception(validS.getMessaggio("carello_not_available"));
+
+		
+		Prezzo prezzo = validS.searchSupporto(riga.getProdotto().getPrezzo(), riga.getSupporto());
 
 		if (prezzo.getStock() != null) {
 			stockS.restoreItem(PickItemReq.builder()
@@ -133,11 +144,11 @@ public class CarelloImpl implements ICarelloServices{
 	 * Questo metodo transforma la string supporto in enum
 	 */
 	private Supporto buildSupporto(String value) throws Exception{
-		msgS.checkNotNull(value, "prezzo_no_supporto");		
+		validS.checkNotNull(value, "prezzo_no_supporto");		
 		try {
 			return Supporto.valueOf(value);				
 		} catch (IllegalArgumentException e) {
-			throw new Exception(msgS.getMessaggio("prezzo_no_supporto"));
+			throw new Exception(validS.getMessaggio("prezzo_no_supporto"));
 		}
 		
 	}
