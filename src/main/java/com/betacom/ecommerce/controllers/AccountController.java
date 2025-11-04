@@ -10,35 +10,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.dto.AccountDTO;
-import com.betacom.ecommerce.dto.SigninDTO;
 import com.betacom.ecommerce.requests.AccountReq;
 import com.betacom.ecommerce.requests.SigninReq;
-import com.betacom.ecommerce.response.ResponseBase;
-import com.betacom.ecommerce.response.ResponseList;
-import com.betacom.ecommerce.response.ResponseObject;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IAccountServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/account")
 public class AccountController {
 
 	private IAccountServices accS;
+	private IValidationServices validS;
 
-	public AccountController(IAccountServices accS) {
+	public AccountController(IAccountServices accS, IValidationServices validS) {
 		this.accS = accS;
+		this.validS = validS;
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<ResponseBase> create(@RequestBody(required = true) AccountReq req) {
-	    ResponseBase response = new ResponseBase();
+	public ResponseEntity<Response> create(@RequestBody(required = true) AccountReq req) {
+	    Response response = new Response();
 	    HttpStatus status = HttpStatus.OK;
 
 	    try {
 	        accS.create(req);
-	        response.setRc(true);
+	        response.setMsg(validS.getMessaggio("created"));
 	    } catch (Exception e) {
-	        response.setRc(false);
 	        response.setMsg(e.getMessage());
 	        status = HttpStatus.BAD_REQUEST;
 	    }
@@ -47,15 +45,14 @@ public class AccountController {
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<ResponseBase> update(@RequestBody(required = true) AccountReq req) {
-	    ResponseBase response = new ResponseBase();
+	public ResponseEntity<Response> update(@RequestBody(required = true) AccountReq req) {
+	    Response response = new Response();
 	    HttpStatus status = HttpStatus.OK;
 
 	    try {
 	        accS.update(req);
-	        response.setRc(true);
+	        response.setMsg(validS.getMessaggio("updated"));
 	    } catch (Exception e) {
-	        response.setRc(false);
 	        response.setMsg(e.getMessage());
 	        status = HttpStatus.BAD_REQUEST;
 	    }
@@ -65,15 +62,13 @@ public class AccountController {
 
 	
 	@PostMapping("/login")
-	ResponseEntity<ResponseObject<SigninDTO>> login (@RequestBody (required = true) SigninReq req){
-		ResponseObject<SigninDTO> r = new ResponseObject<SigninDTO>();
+	ResponseEntity<Object> login (@RequestBody (required = true) SigninReq req){
 		  HttpStatus status = HttpStatus.OK;
+		  Object r = new Object();
 		try {
-			r.setDati(accS.login(req));
-			r.setRc(true);
+			r = accS.login(req);
 		} catch (Exception e) {
-			r.setMsg(e.getMessage());
-			r.setRc(false);
+			r = e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);
@@ -81,7 +76,7 @@ public class AccountController {
 	}
 	
 	@GetMapping("/list")
-	public ResponseEntity<ResponseList<AccountDTO>> list(
+	public ResponseEntity<Object> list(
 			@RequestParam (required = false) Integer id,
 			@RequestParam (required = false) String nome,
 			@RequestParam (required = false) String cognome,
@@ -89,14 +84,12 @@ public class AccountController {
 			@RequestParam (required = false) String stat,
 			@RequestParam (required = false) String role
 			){	
-		ResponseList<AccountDTO> r = new ResponseList<AccountDTO>();
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(accS.list(id, nome, cognome, commune, stat, role));
-			r.setRc(true);
+			r = accS.list(id, nome, cognome, commune, stat, role);
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r = e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);

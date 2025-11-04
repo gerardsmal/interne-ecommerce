@@ -92,10 +92,7 @@ public class StockImpl implements IStockServices{
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 
 		msgS.checkNotNull(prez.getStock(), "stock_ntfnd");
-		/*
-		if (prez.getStock() == null) 
-			throw new Exception(msgS.getMessaggio("stock_ntfnd"));
-		*/	
+
 		Stock st = prez.getStock();
 		
 		st.setCurrentStock(st.getCurrentStock() - req.getNumeroItems());

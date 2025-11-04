@@ -11,33 +11,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.dto.ArtistaDTO;
 import com.betacom.ecommerce.requests.ArtistReq;
 import com.betacom.ecommerce.requests.ChangeFamilyReq;
-import com.betacom.ecommerce.response.ResponseBase;
-import com.betacom.ecommerce.response.ResponseList;
-import com.betacom.ecommerce.response.ResponseObject;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/artist")
 public class ArtistController {
 
 	private IArtistServices artS;
+	private IValidationServices validS;
 
-	public ArtistController(IArtistServices artS) {
+	public ArtistController(IArtistServices artS,IValidationServices validS) {
 		this.artS = artS;
+		this.validS = validS;
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) ArtistReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> create(@RequestBody (required = true) ArtistReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.create(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("created"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -45,14 +44,13 @@ public class ArtistController {
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<ResponseBase> update(@RequestBody (required = true) ArtistReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> update(@RequestBody (required = true) ArtistReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.update(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("updated"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}		
@@ -60,14 +58,13 @@ public class ArtistController {
 	}
 
 	@DeleteMapping("/delete")
-	public ResponseEntity<ResponseBase> delete(@RequestBody (required = true) ArtistReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> delete(@RequestBody (required = true) ArtistReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.remove(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -77,14 +74,13 @@ public class ArtistController {
 	
 	
 	@DeleteMapping("/removeFamiglia")
-	public ResponseEntity<ResponseBase> removeFamiglia(@RequestBody (required = true) ArtistReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> removeFamiglia(@RequestBody (required = true) ArtistReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.removeFamigliaArtist(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}	
@@ -93,14 +89,13 @@ public class ArtistController {
 
 	
 	@PutMapping("/changeFamily")
-	public ResponseEntity<ResponseBase> changeFamily(@RequestBody (required = true) ChangeFamilyReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> changeFamily(@RequestBody (required = true) ChangeFamilyReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			artS.changeFamily(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("updated"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -108,30 +103,26 @@ public class ArtistController {
 	}
 	
 	@GetMapping("/listArtistbyId")
-	public ResponseEntity<ResponseObject<ArtistaDTO>> listArtistbyId(@RequestParam (required = true) Integer id){
-		ResponseObject<ArtistaDTO> r = new ResponseObject<ArtistaDTO>();
+	public ResponseEntity<Object> listArtistbyId(@RequestParam (required = true) Integer id){
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(artS.listByArtista(id));
-			r.setRc(true);
+			r = artS.listByArtista(id);
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r = e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);
 	}
 
 	@GetMapping("/list")
-	public ResponseEntity<ResponseList<ArtistaDTO>> list(){
-		ResponseList<ArtistaDTO> r = new ResponseList<ArtistaDTO>();
+	public ResponseEntity<Object> list(){
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(artS.list());
-			r.setRc(true);
+			r= artS.list();
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);

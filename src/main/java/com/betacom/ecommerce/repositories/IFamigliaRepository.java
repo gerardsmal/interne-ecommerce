@@ -8,5 +8,5 @@ import com.betacom.ecommerce.models.Famiglia;
 
 public interface IFamigliaRepository extends JpaRepository<Famiglia, Integer>{
 	Optional<Famiglia> findByDescrizione(String descrizione);
-
+	boolean existsByDescrizione(String descrizione);
 }

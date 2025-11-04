@@ -36,10 +36,9 @@ public class FamigliaImpl  implements IFamigliaServices{
 	public void create(FamigliaReq req) throws Exception {
 		log.debug("Begin create:" + req);
 		
-		Optional<Famiglia> fam = repoF.findByDescrizione(req.getDescrizione().trim());
-		if (fam.isPresent()) {
+		if (repoF.existsByDescrizione(req.getDescrizione().trim()))
 			throw new Exception(msgS.getMessaggio("fam_fnd"));
-		}
+		
 		Famiglia f = new Famiglia();
 		f.setDescrizione(req.getDescrizione().trim());
 		
@@ -55,13 +54,12 @@ public class FamigliaImpl  implements IFamigliaServices{
 		Famiglia fam = repoF.findById(req.getId())
 				.orElseThrow(() ->new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
-		if (req.getDescrizione() != null) {
-			fam.setDescrizione(req.getDescrizione().trim());
-			
-			repoF.save(fam);
-			
-		}
-		
+		Optional.ofNullable(req.getDescrizione())
+			.map(String::trim)   // trim descrizione
+			.ifPresent(desc -> {
+				fam.setDescrizione(desc);
+				repoF.save(fam);
+			});		
 	}
 	
 	@Transactional (rollbackFor = Exception.class)
@@ -110,15 +108,13 @@ public class FamigliaImpl  implements IFamigliaServices{
 	@Override
 	public ProdottoFamigliaDTO ListByIdProdottoFamiglia(Integer id) throws Exception {
 		log.debug("Begin ListByIdProdottoFamiglia :" + id);
-		Optional<Famiglia> fam = repoF.findById(id);
-		if (fam.isEmpty()) {
-			throw new Exception(msgS.getMessaggio("fam_ntfnd"));
-		}
+		Famiglia fam = repoF.findById(id)
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
 		return  ProdottoFamigliaDTO.builder()
-				.id(fam.get().getId())
-				.descrizione(fam.get().getDescrizione())
-				.prodotto(buildProdottoList(fam.get().getProdotto()))
+				.id(fam.getId())
+				.descrizione(fam.getDescrizione())
+				.prodotto(buildProdottoList(fam.getProdotto()))
 				.build();
 	}
 	

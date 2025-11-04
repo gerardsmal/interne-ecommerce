@@ -13,6 +13,7 @@ import com.betacom.ecommerce.models.Prodotto;
 
 public interface IAccountRepository extends JpaRepository<Account, Integer>{
 	Optional<Account> findByUserName(String user);
+	boolean existsByUserName(String user);
 
 	
 	@Query(name="account.searchByFilter" )

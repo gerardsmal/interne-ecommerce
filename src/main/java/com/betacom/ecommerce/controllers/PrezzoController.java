@@ -9,28 +9,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.betacom.ecommerce.requests.PrezzoReq;
-import com.betacom.ecommerce.response.ResponseBase;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IPrezzoServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/prezzo")
 public class PrezzoController {
 
 	private IPrezzoServices prezzoS;
+	private IValidationServices validS;
 
-	public PrezzoController(IPrezzoServices prezzoS) {
+	public PrezzoController(IPrezzoServices prezzoS, IValidationServices validS) {
 		this.prezzoS = prezzoS;
+		this.validS = validS;
 	}
 	
 	@PostMapping("/addPrezzo")
-	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) PrezzoReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> create(@RequestBody (required = true) PrezzoReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			prezzoS.addPrezzo(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("added"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -38,14 +40,13 @@ public class PrezzoController {
 	}
 	
 	@DeleteMapping("/deletePrezzo")
-	public ResponseEntity<ResponseBase> deletePrezzo(@RequestBody (required = true) PrezzoReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> deletePrezzo(@RequestBody (required = true) PrezzoReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			prezzoS.removePrezzo(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}

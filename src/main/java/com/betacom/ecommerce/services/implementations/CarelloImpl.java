@@ -2,12 +2,14 @@ package com.betacom.ecommerce.services.implementations;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.betacom.ecommerce.enums.StatoCarello;
 import com.betacom.ecommerce.enums.Supporto;
+import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Carello;
 import com.betacom.ecommerce.models.Prezzo;
@@ -59,8 +61,10 @@ public class CarelloImpl implements ICarelloServices{
 		Account ac = accountR.findById(req.getAccountID())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("account_ntfnd")));
 		
-		if (ac.getCarello()!= null)
-				throw new Exception(validS.getMessaggio("carello_exist"));
+		Optional.ofNullable(ac.getCarello())
+			.ifPresent(c -> {
+				throw new EcommerceException(validS.getMessaggio("carello_exist"));
+			});
 		
 		Carello car = new Carello();
 		car.setAccount(ac);
@@ -76,17 +80,21 @@ public class CarelloImpl implements ICarelloServices{
 		log.debug("addRiga:" + req);
 		Carello carello = carR.findById(req.getIdCarello())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("carello_ntfnd")));
+	
+		Optional.ofNullable(carello.getStato())
+			.filter(stato -> stato == StatoCarello.valueOf("ordine"))
+			.ifPresent(stato -> {
+				throw new EcommerceException(validS.getMessaggio("carello_not_available"));
+			});
 		
-		if (carello.getStato() == StatoCarello.valueOf("ordine"))
-			throw new Exception(validS.getMessaggio("carello_not_available"));
-
 		
 		Prodotto prodotto = prodR.findById(req.getIdProdotto())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("prod_ntfnd")));
 		
-		if (req.getQuantita() == null || req.getQuantita() <= 0)
-			throw new Exception(validS.getMessaggio("carello_quantita_ko"));
-		
+		Optional.ofNullable(req.getQuantita())
+			.filter(q -> q > 0)
+			.orElseThrow(() -> new Exception(validS.getMessaggio("carello_quantita_ko")));
+				
 		Supporto sup = buildSupporto(req.getSupporto());
 		
 		Prezzo prezzo = validS.searchSupporto(prodotto.getPrezzo(), sup);
@@ -119,8 +127,12 @@ public class CarelloImpl implements ICarelloServices{
 		RigaCarello riga =  rigaR.findById(req.getId())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("carello_elem_ko")));
 
-		if (riga.getCarello().getStato() == StatoCarello.valueOf("ordine"))
-			throw new Exception(validS.getMessaggio("carello_not_available"));
+		Optional.ofNullable(riga.getCarello().getStato())
+			.filter(stato -> stato == StatoCarello.valueOf("ordine"))
+			.ifPresent(stato -> {
+				throw new EcommerceException(validS.getMessaggio("carello_not_available"));
+			});
+
 
 		
 		Prezzo prezzo = validS.searchSupporto(riga.getProdotto().getPrezzo(), riga.getSupporto());

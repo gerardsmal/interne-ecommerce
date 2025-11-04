@@ -10,34 +10,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.dto.AccountDTO;
-import com.betacom.ecommerce.dto.OrderDTO;
 import com.betacom.ecommerce.requests.OrderReq;
-import com.betacom.ecommerce.requests.RigaCarelloReq;
-import com.betacom.ecommerce.response.ResponseBase;
-import com.betacom.ecommerce.response.ResponseList;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IOrderServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/order")
 public class OrderController {
 
 	private IOrderServices orderS;
+	private IValidationServices validS;
 
-	public OrderController(IOrderServices orderS) {
+	public OrderController(IOrderServices orderS, IValidationServices validS) {
 		this.orderS = orderS;
+		this.validS = validS;
 	}
 
 	
 	@PostMapping("/create")
-	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) OrderReq req) {
-		ResponseBase r = new ResponseBase(); 
+	public ResponseEntity<Response> create(@RequestBody (required = true) OrderReq req) {
+		Response r = new Response(); 
 		HttpStatus status = HttpStatus.OK;
 		try {
 			orderS.create(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("created"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -45,14 +43,13 @@ public class OrderController {
 	}
 
 	@PostMapping("/confirm")
-	public ResponseEntity<ResponseBase> confirm(@RequestBody (required = true) OrderReq req) {
-		ResponseBase r = new ResponseBase(); 
+	public ResponseEntity<Response> confirm(@RequestBody (required = true) OrderReq req) {
+		Response r = new Response(); 
 		HttpStatus status = HttpStatus.OK;
 		try {
 			orderS.confirm(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("confirmed"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -62,14 +59,13 @@ public class OrderController {
 	
 	
 	@DeleteMapping("/delete")
-	public ResponseEntity<ResponseBase> deleteRiga(@RequestBody (required = true) OrderReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> deleteRiga(@RequestBody (required = true) OrderReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			orderS.remove(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -77,15 +73,13 @@ public class OrderController {
 	}
 	
 	@GetMapping("/list")
-	public ResponseEntity<ResponseList<OrderDTO>> list(@RequestParam (required = true) Integer id){	
-		ResponseList<OrderDTO> r = new ResponseList<OrderDTO>();
+	public ResponseEntity<Object> list(@RequestParam (required = true) Integer id){	
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(orderS.listByAccountId(id));
-			r.setRc(true);
+			r=orderS.listByAccountId(id);
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);

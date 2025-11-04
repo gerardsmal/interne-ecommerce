@@ -8,5 +8,5 @@ import com.betacom.ecommerce.models.Artist;
 
 public interface IArtistRepository extends JpaRepository<Artist, Integer>{
 	Optional<Artist> findByNome(String nome);
-
+	boolean existsByNome(String nome);
 }

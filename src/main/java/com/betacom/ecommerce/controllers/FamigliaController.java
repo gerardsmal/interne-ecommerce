@@ -11,34 +11,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.dto.FamigliaDTO;
-import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
 import com.betacom.ecommerce.requests.FamigliaReq;
-import com.betacom.ecommerce.response.ResponseBase;
-import com.betacom.ecommerce.response.ResponseList;
-import com.betacom.ecommerce.response.ResponseObject;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IFamigliaServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/famiglia")
 public class FamigliaController {
 
 	private IFamigliaServices famS;
-
-	public FamigliaController(IFamigliaServices famS) {
+	private IValidationServices validS;
+	
+	public FamigliaController(IFamigliaServices famS, IValidationServices validS) {
 		this.famS = famS;
+		this.validS = validS;
 	}
 
 	
 	@PostMapping("/create")
-	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) FamigliaReq req) {
-		ResponseBase r = new ResponseBase(); 
+	public ResponseEntity<Response> create(@RequestBody (required = true) FamigliaReq req) {
+		Response r = new Response(); 
 		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.create(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("created"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -46,14 +44,13 @@ public class FamigliaController {
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<ResponseBase> update(@RequestBody (required = true) FamigliaReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> update(@RequestBody (required = true) FamigliaReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.update(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("updated"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -62,14 +59,13 @@ public class FamigliaController {
 
 
 	@DeleteMapping("/delete")
-	public ResponseEntity<ResponseBase> delete(@RequestBody (required = true) FamigliaReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> delete(@RequestBody (required = true) FamigliaReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			famS.delete(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -77,45 +73,39 @@ public class FamigliaController {
 	}
 	
 	@GetMapping("/list")
-	public ResponseEntity<ResponseList<FamigliaDTO>> list(){
-		ResponseList<FamigliaDTO> r = new ResponseList<FamigliaDTO>();
+	public ResponseEntity<Object> list(){
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(famS.list());
-			r.setRc(true);
+			r=famS.list();
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);
 	}
 	
 	@GetMapping("/listByProduct")
-	public ResponseEntity<ResponseList<ProdottoFamigliaDTO>> listByProduct(){
-		ResponseList<ProdottoFamigliaDTO> r = new ResponseList<ProdottoFamigliaDTO>();
+	public ResponseEntity<Object> listByProduct(){
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(famS.listPerFamiglia());
-			r.setRc(true);
+			r=famS.listPerFamiglia();
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);
 	}
 
 	@GetMapping("/listProductbyId")
-	public ResponseEntity<ResponseObject<ProdottoFamigliaDTO>> listProductbyId(@RequestParam (required = true) Integer id){
-		ResponseObject<ProdottoFamigliaDTO> r = new ResponseObject<ProdottoFamigliaDTO>();
+	public ResponseEntity<Object> listProductbyId(@RequestParam (required = true) Integer id){
+		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r.setDati(famS.ListByIdProdottoFamiglia(id));
-			r.setRc(true);
+			r=famS.ListByIdProdottoFamiglia(id);
 		} catch (Exception e) {
-			r.setRc(false);
-			r.setMsg(e.getMessage());
+			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);

@@ -3,6 +3,7 @@ package com.betacom.ecommerce.services.implementations;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import com.betacom.ecommerce.dto.CarelloDTO;
 import com.betacom.ecommerce.dto.CarelloRigaDTO;
 import com.betacom.ecommerce.dto.SigninDTO;
 import com.betacom.ecommerce.enums.Role;
+import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.models.RigaCarello;
@@ -45,10 +47,10 @@ public class AccountImpl implements IAccountServices{
 		this.encoder = encoder;
 	}
 
-	@Transactional (rollbackFor = Exception.class)
 	@Override
 	public void create(AccountReq req) throws Exception {
 		log.debug("create:" + req);
+		
 		
 
 		validS.checkNotNull(req.getNome(), "account_no_nome");
@@ -73,10 +75,8 @@ public class AccountImpl implements IAccountServices{
 		}
 		if (req.getSesso() == null) req.setSesso(true);
 		
-		Optional<Account> a = accR.findByUserName(req.getUserName());
-		if (a.isPresent())
-			throw new Exception(validS.getMessaggio("account_username_ko"));	
-		
+		if (accR.existsByUserName(req.getUserName()))
+			throw new Exception(validS.getMessaggio("account_username_ko"));
 		
 		Account acc = new Account();
 		acc.setNome(req.getNome());
@@ -102,37 +102,46 @@ public class AccountImpl implements IAccountServices{
 		log.debug("update:" + req);
 		Account acc = accR.findById(req.getId())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("account_ntfnd")));
-
-		if (req.getNome() != null) acc.setNome(req.getNome());
-		if (req.getCognome() != null)   acc.setCognome(req.getCognome());
-		if (req.getEmail() != null) {
-			validS.validateWithRegex(req.getEmail(), emailRegex, "account_email_ko");
-			acc.setEmail(req.getEmail());					
-		}
 		
-		if (req.getCommune() != null) acc.setCommune(req.getCommune());
-		if (req.getVia() != null) acc.setVia(req.getVia());
-		if (req.getCap() != null) {
-			validS.validateWithRegex(req.getCap(), capRegex, "account_cap_ko");
-			acc.setCap(req.getCap());
-		}
-		if (req.getTelefono() != null) {
-			validS.validateWithRegex(req.getTelefono(), telefonoRegex, "account_telefono_ko");
-			acc.setTelefono(req.getTelefono());
-		}
-		if (req.getUserName() != null) {
-			if (!req.getUserName().equalsIgnoreCase(acc.getUserName())) {
-				Optional<Account> a = accR.findByUserName(req.getUserName());
-				if (a.isPresent())
-					throw new Exception(validS.getMessaggio("account_username_ko"));	
-				acc.setUserName(req.getUserName());				
+		Optional.ofNullable(req.getNome()).ifPresent(acc::setNome);
+		Optional.ofNullable(req.getCognome()).ifPresent(acc::setCognome);
+
+		Optional.ofNullable(req.getEmail())
+			.ifPresent(email -> {
+				validS.validateWithRegex(email, emailRegex, "account_email_ko");
+				acc.setEmail(email);
+			});
+
+		Optional.ofNullable(req.getCommune()).ifPresent(acc::setCommune);
+		Optional.ofNullable(req.getVia()).ifPresent(acc::setVia);
+
+		Optional.ofNullable(req.getCap())
+			.ifPresent(cap -> {
+				validS.validateWithRegex(cap, capRegex, "account_cap_ko");
+				acc.setCap(cap);
+			});
+
+		Optional.ofNullable(req.getTelefono())
+			.ifPresent(tel -> {
+				validS.validateWithRegex(tel, telefonoRegex, "account_telefono_ko");
+				acc.setTelefono(tel);
+			});
+
+		
+		Optional.ofNullable(req.getUserName()).ifPresent(s -> {
+			if (!req.getUserName().equalsIgnoreCase(acc.getUserName())) {			
+				if (accR.existsByUserName(req.getUserName())) {
+					throw new RuntimeException(validS.getMessaggio("account_username_ko"));				
+				}
 			}
 			
-		}
-		if (req.getPwd() != null) {
-			validS.validatePassword(req.getPwd());		
-			acc.setPwd(encoder.encode(req.getPwd()));  // encode password
-		}
+		});		
+
+		Optional.ofNullable(req.getPwd())
+			.ifPresent(pwd -> {
+				validS.validatePassword(pwd);	
+				acc.setTelefono(pwd);
+			});
 		
 		if (req.getRole() != null) {
 			Role role = null;
@@ -143,9 +152,9 @@ public class AccountImpl implements IAccountServices{
 			}
 			acc.setRole(role);
 		}
-		if (req.getSesso() != null) acc.setSesso(req.getSesso());
-		
-		if (req.getStatus() != null) acc.setStatus(req.getStatus());
+
+		Optional.ofNullable(req.getSesso()).ifPresent(acc::setSesso);
+		Optional.ofNullable(req.getStatus()).ifPresent(acc::setStatus);
 		
 		accR.save(acc);
 		
@@ -184,7 +193,6 @@ public class AccountImpl implements IAccountServices{
 		Role ro = null;
 		
 		if (status != null) sta = (status.equalsIgnoreCase("Attivo")) ? true : false;
-		
 		if (role != null)  ro = Role.valueOf(role.trim().toUpperCase());
 		
 		List<Account> lA = accR.searchByFilter(id, nome, cognome, commune, sta, ro);

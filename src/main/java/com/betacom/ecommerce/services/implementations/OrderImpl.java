@@ -2,6 +2,7 @@ package com.betacom.ecommerce.services.implementations;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,9 +119,10 @@ public class OrderImpl implements IOrderServices{
 		Order order = orderR.findById(req.getId())
 				.orElseThrow(() -> new Exception(validS.getMessaggio("order_ntfnd")));
 		
-		if (!order.getStatusPagamento().equals(StatusPagamento.valueOf("IN_CORSO"))) {
-			throw new Exception(validS.getMessaggio("order_not_cancelabile"));
-		}
+		// control order status
+		Optional.ofNullable(order.getStatusPagamento())
+			.filter(status -> status.equals(StatusPagamento.valueOf("IN_CORSO")))
+			.orElseThrow(() -> new Exception(validS.getMessaggio("order_not_cancelabile")));
 		
 		Carello carello = order.getAccount().getCarello();
 		

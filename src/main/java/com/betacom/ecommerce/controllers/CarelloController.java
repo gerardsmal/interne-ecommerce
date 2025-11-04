@@ -10,27 +10,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.betacom.ecommerce.requests.CarelloReq;
 import com.betacom.ecommerce.requests.RigaCarelloReq;
-import com.betacom.ecommerce.response.ResponseBase;
+import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.ICarelloServices;
+import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
 @RestController
 @RequestMapping("rest/carello")
 public class CarelloController {
 	private ICarelloServices carS;
+	private IValidationServices validS;
 	
-	public CarelloController(ICarelloServices carS) {
+	public CarelloController(ICarelloServices carS, IValidationServices validS) {
 		this.carS = carS;
+		this.validS = validS;
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<ResponseBase> create(@RequestBody (required = true) CarelloReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> create(@RequestBody (required = true) CarelloReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			carS.create(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("created"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -38,28 +40,26 @@ public class CarelloController {
 	}
 	
 	@PostMapping("/addRiga")
-	public ResponseEntity<ResponseBase> addRiga(@RequestBody (required = true) RigaCarelloReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> addRiga(@RequestBody (required = true) RigaCarelloReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			carS.addRiga(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("created"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return ResponseEntity.status(status).body(r);	}
 	
 	@DeleteMapping("/deleteRiga")
-	public ResponseEntity<ResponseBase> deleteRiga(@RequestBody (required = true) RigaCarelloReq req) {
-		ResponseBase r = new ResponseBase();
+	public ResponseEntity<Response> deleteRiga(@RequestBody (required = true) RigaCarelloReq req) {
+		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
 			carS.removeRiga(req);
-			r.setRc(true);
+			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
-			r.setRc(false);
 			r.setMsg(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}

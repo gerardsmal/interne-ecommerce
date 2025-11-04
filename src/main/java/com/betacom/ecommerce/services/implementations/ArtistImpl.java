@@ -4,12 +4,14 @@ import static com.betacom.ecommerce.utils.Utilities.buildFamigliaDTOList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.betacom.ecommerce.dto.ArtistaDTO;
+import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Artist;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.repositories.IArtistRepository;
@@ -42,9 +44,9 @@ public class ArtistImpl implements IArtistServices{
 		log.debug("create:" + req);
 		msgS.checkNotNull(req.getNome(), "artist_no_name");
 		
-		Optional<Artist> ar = artS.findByNome(req.getNome().trim());
-		if (ar.isPresent())
+		if ( artS.existsByNome(req.getNome().trim())) {
 			throw new Exception(msgS.getMessaggio("artist_fnd"));
+		} 
 			
 		Artist artist = new Artist();
 		artist.setNome(req.getNome().trim());
@@ -63,33 +65,27 @@ public class ArtistImpl implements IArtistServices{
 	@Override
 	public void update(ArtistReq req) throws Exception {
 		log.debug("update:" + req);
-		Optional<Artist> ar = artS.findById(req.getId());
-		if (ar.isEmpty())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
+		Artist artist = artS.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
 		
-		Artist artist = ar.get();
-		if (req.getNome() != null) {
-			Optional<Artist> pr = artS.findByNome(req.getNome().trim());
-			if (pr.isPresent())
-				throw new Exception(msgS.getMessaggio("artist_fnd"));
-			artist.setNome(req.getNome().trim());
-		}
+		Optional.ofNullable(req.getNome())
+			.ifPresent(nome -> {
+				if (artS.existsByNome(nome.trim()))
+					throw new EcommerceException(msgS.getMessaggio("artist_fnd"));
+			});
 	
-		// remove family if exist
-		ar.ifPresent(arObj -> 
-			arObj.getFamiglia().stream()
-			.filter(f -> f.getId() == req.getIdFamiglia())
+		// remove family if exist 
+		artist.getFamiglia().stream()
+			.filter(f -> Objects.equals(f.getId(), req.getIdFamiglia()))
 			.findFirst()
-			.ifPresent(arObj.getFamiglia()::remove));
+			.ifPresent(f -> artist.getFamiglia().remove(f));
 
-		if (req.getIdFamiglia() != null) {
-			Optional<Famiglia> fam = famS.findById(req.getIdFamiglia());
-			if (fam.isEmpty())
-				throw new Exception(msgS.getMessaggio("fam_ntfnd"));
-			artist.getFamiglia().add(fam.get());			
-		}
-		
-		
+		Optional.ofNullable(req.getIdFamiglia())
+			.ifPresent(idFamiglia -> {
+				Famiglia fam = famS.findById(idFamiglia)
+						.orElseThrow(() -> new EcommerceException(msgS.getMessaggio("fam_ntfnd")));
+				artist.getFamiglia().add(fam);								
+			});
 
 		artS.save(artist);	
 		
@@ -100,24 +96,21 @@ public class ArtistImpl implements IArtistServices{
 	@Override
 	public void removeFamigliaArtist(ArtistReq req) throws Exception {
 		log.debug("remove:" + req);
-		Optional<Artist> ar = artS.findById(req.getId());
-		if (ar.isEmpty())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
+		Artist ar = artS.findById(req.getId())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
 		
-		int size = ar.get().getFamiglia().size(); 
+		int size = ar.getFamiglia().size(); 
 		
-		ar.ifPresent(arObj ->
-				arObj.getFamiglia().stream()
-				.filter(f -> f.getId() == req.getIdFamiglia())
-				.findFirst()
-				.ifPresent(arObj.getFamiglia()::remove)   
-				);
+		ar.getFamiglia().stream()
+			.filter(f -> Objects.equals(f.getId(), req.getIdFamiglia()))
+			.findFirst()
+			.ifPresent(f -> ar.getFamiglia().remove(f));
 		
-		if (size == ar.get().getFamiglia().size())
-			throw new Exception(msgS.getMessaggio("artist-no-fam"));
-		
-		
-		artS.save(ar.get());
+		Optional.ofNullable(size)
+			.filter(s -> s != ar.getFamiglia().size())
+			.orElseThrow(() -> new Exception(msgS.getMessaggio("artist-no-fam")));
+				
+		artS.save(ar);
 		
 	}
 
@@ -157,14 +150,14 @@ public class ArtistImpl implements IArtistServices{
 	public ArtistaDTO listByArtista(Integer id) throws Exception {
 		log.debug("listByArtista:" + id);
 		
-		Optional<Artist> art = artS.findById(id);
-		if (art.isEmpty())
-			throw new Exception(msgS.getMessaggio("artist_ntfnd"));
+		Artist art = artS.findById(id)
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
+	
 		
 		return ArtistaDTO.builder()
-				.id(art.get().getId())
-				.nome(art.get().getNome())
-				.famiglia(buildFamigliaDTOList(art.get().getFamiglia()))
+				.id(art.getId())
+				.nome(art.getNome())
+				.famiglia(buildFamigliaDTOList(art.getFamiglia()))
 				.build();
 	}
 

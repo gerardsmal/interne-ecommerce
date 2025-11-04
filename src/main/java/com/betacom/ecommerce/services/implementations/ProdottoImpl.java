@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.betacom.ecommerce.dto.ArtistaDTO;
 import com.betacom.ecommerce.dto.FamigliaDTO;
 import com.betacom.ecommerce.dto.ProdottoDTO;
+import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Artist;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prodotto;
@@ -78,10 +79,7 @@ public class ProdottoImpl implements IProdottoServices{
 		Prodotto prod = repP.findById(req.getId())
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
 		
-		
-		if (req.getDescrizione() != null) {
-			prod.setDescrizione(req.getDescrizione().trim());
-		}
+		Optional.ofNullable(req.getDescrizione()).ifPresent(prod::setDescrizione);
 				
 		if (req.getIdArtist() != null) {
 			Artist artist = artistR.findById(req.getIdArtist())
@@ -89,9 +87,11 @@ public class ProdottoImpl implements IProdottoServices{
 			prod.setArtista(artist);			
 		}
 		
-		if (req.getIdFamiglia() != null) {
-			prod.setFamiglia(controlFamiglia(prod.getArtista().getFamiglia(), req.getIdFamiglia()));
-		}
+		
+		Optional.ofNullable(req.getIdFamiglia())
+			.ifPresent(idFamiglia -> {
+				prod.setFamiglia(controlFamiglia(prod.getArtista().getFamiglia(), idFamiglia));
+			});
 		
 		repP.save(prod);
 	}
@@ -140,11 +140,11 @@ public class ProdottoImpl implements IProdottoServices{
 	 * control family validity
 	 * family must be compatible with original artist family
 	 */
-	Famiglia controlFamiglia(List<Famiglia> lF, Integer idFamiglia) throws Exception{
+	Famiglia controlFamiglia(List<Famiglia> lF, Integer idFamiglia) throws EcommerceException{
 		Famiglia fam = lF.stream()
 			    .filter(f -> f.getId() == idFamiglia)
 			    .findFirst()
-			    .orElseThrow(() -> new Exception(msgS.getMessaggio("prod_fam.incomp")));
+			    .orElseThrow(() -> new EcommerceException(msgS.getMessaggio("prod_fam.incomp")));
 		return fam;
 	}
 	
