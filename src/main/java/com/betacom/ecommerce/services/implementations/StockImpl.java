@@ -1,5 +1,8 @@
 package com.betacom.ecommerce.services.implementations;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,24 +39,21 @@ public class StockImpl implements IStockServices{
 		Prezzo prez = prezzoR.findById(req.getPrezzoId())
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 		
-		Stock stock = null;
-		if (prez.getStock() == null) {
-			stock = new Stock();
-		} else {
-			stock = prez.getStock();
-		}
-		if (req.getCurrentStock() != null)
-			stock.setCurrentStock(req.getCurrentStock());
-		if (req.getStockAlert() != null)
-			stock.setStockAlert(req.getStockAlert());
+		// load instance if exist else create new instance
+		Stock stock = Objects.requireNonNullElseGet(prez.getStock(), Stock::new);
 		
+		Optional.ofNullable(req.getCurrentStock()).ifPresent(stock::setCurrentStock);
+		Optional.ofNullable(req.getStockAlert()).ifPresent(stock::setStockAlert);
+		
+				
 		/*
 		 * control stock
 		 */
-		if (stock.getCurrentStock() == null)
-			throw new Exception(msgS.getMessaggio("stock_no_current"));
-		if (stock.getStockAlert() == null)
-			throw new Exception(msgS.getMessaggio("stock_no_alert"));
+		Optional.ofNullable(stock.getCurrentStock())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("stock_no_current")));
+		Optional.ofNullable(stock.getStockAlert())
+				.orElseThrow(() -> new Exception(msgS.getMessaggio("stock_no_alert")));
+
 		
 		stockR.save(stock);
 		log.debug("Stocke saved");
@@ -70,9 +70,9 @@ public class StockImpl implements IStockServices{
 		Prezzo prez = prezzoR.findById(req.getPrezzoId())
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("prezzo_ntfnd")));
 
-		if (prez.getStock() == null) 
-			throw new Exception(msgS.getMessaggio("stock_ntfnd"));
-		
+		Optional.ofNullable(prez.getStock())
+			.orElseThrow(() -> new Exception(msgS.getMessaggio("stock_ntfnd")));
+				
 		int id = prez.getStock().getId();
 		
 		prez.setStock(null);
@@ -97,8 +97,10 @@ public class StockImpl implements IStockServices{
 		
 		st.setCurrentStock(st.getCurrentStock() - req.getNumeroItems());
 		
-		if (st.getCurrentStock() <= 0)
-			throw new Exception(msgS.getMessaggio("stock_no_qta"));
+		Optional.ofNullable(st.getCurrentStock())       // stock must be positive
+			.filter(q -> q > 0)
+			.orElseThrow(() -> new Exception(msgS.getMessaggio("stock_no_qta")));
+		
 		stockR.save(st);
 		
 	}
