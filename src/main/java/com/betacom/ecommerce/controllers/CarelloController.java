@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.requests.CarelloReq;
-import com.betacom.ecommerce.requests.RigaCarelloReq;
+import com.betacom.ecommerce.dto.input.CarelloReq;
+import com.betacom.ecommerce.dto.input.RigaCarelloReq;
 import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.ICarelloServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;

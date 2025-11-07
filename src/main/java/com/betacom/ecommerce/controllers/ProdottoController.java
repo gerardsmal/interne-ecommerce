@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.requests.ProdottoReq;
+import com.betacom.ecommerce.dto.input.ProdottoReq;
 import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IProdottoServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;

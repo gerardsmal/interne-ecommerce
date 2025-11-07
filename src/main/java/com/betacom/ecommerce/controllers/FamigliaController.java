@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.requests.FamigliaReq;
+import com.betacom.ecommerce.dto.input.FamigliaReq;
 import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IFamigliaServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;

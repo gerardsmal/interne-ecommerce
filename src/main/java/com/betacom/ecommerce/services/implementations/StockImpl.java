@@ -6,12 +6,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.betacom.ecommerce.dto.input.PickItemReq;
+import com.betacom.ecommerce.dto.input.StockReq;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.models.Stock;
 import com.betacom.ecommerce.repositories.IPrezzoRepository;
 import com.betacom.ecommerce.repositories.IStockRepositoy;
-import com.betacom.ecommerce.requests.PickItemReq;
-import com.betacom.ecommerce.requests.StockReq;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 import com.betacom.ecommerce.services.interfaces.IStockServices;
 

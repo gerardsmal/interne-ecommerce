@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.requests.ArtistReq;
-import com.betacom.ecommerce.requests.ChangeFamilyReq;
+import com.betacom.ecommerce.dto.input.ArtistReq;
+import com.betacom.ecommerce.dto.input.ChangeFamilyReq;
 import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;

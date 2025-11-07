@@ -2,9 +2,9 @@ package com.betacom.ecommerce.utils;
 
 import java.util.List;
 
-import com.betacom.ecommerce.dto.FamigliaDTO;
-import com.betacom.ecommerce.dto.PrezzoDTO;
-import com.betacom.ecommerce.dto.StockDTO;
+import com.betacom.ecommerce.dto.output.FamigliaDTO;
+import com.betacom.ecommerce.dto.output.PrezzoDTO;
+import com.betacom.ecommerce.dto.output.StockDTO;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prezzo;
 

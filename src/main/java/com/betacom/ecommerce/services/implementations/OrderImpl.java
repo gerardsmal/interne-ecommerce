@@ -7,8 +7,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.betacom.ecommerce.dto.OrderDTO;
-import com.betacom.ecommerce.dto.OrderItemDTO;
+import com.betacom.ecommerce.dto.input.OrderReq;
+import com.betacom.ecommerce.dto.output.OrderDTO;
+import com.betacom.ecommerce.dto.output.OrderItemDTO;
 import com.betacom.ecommerce.enums.StatoCarello;
 import com.betacom.ecommerce.enums.StatusPagamento;
 import com.betacom.ecommerce.models.Account;
@@ -22,7 +23,6 @@ import com.betacom.ecommerce.repositories.ICarelloRepository;
 import com.betacom.ecommerce.repositories.IOrderItemsRepository;
 import com.betacom.ecommerce.repositories.IOrderRepository;
 import com.betacom.ecommerce.repositories.IRigaCarelloRepository;
-import com.betacom.ecommerce.requests.OrderReq;
 import com.betacom.ecommerce.services.interfaces.IOrderServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 

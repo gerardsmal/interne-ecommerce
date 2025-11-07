@@ -6,13 +6,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.betacom.ecommerce.dto.FamigliaDTO;
-import com.betacom.ecommerce.dto.ProdottoDTO;
-import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
+import com.betacom.ecommerce.dto.input.FamigliaReq;
+import com.betacom.ecommerce.dto.output.FamigliaDTO;
+import com.betacom.ecommerce.dto.output.ProdottoDTO;
+import com.betacom.ecommerce.dto.output.ProdottoFamigliaDTO;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
-import com.betacom.ecommerce.requests.FamigliaReq;
 import com.betacom.ecommerce.services.interfaces.IFamigliaServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 

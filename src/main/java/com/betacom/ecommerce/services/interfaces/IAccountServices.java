@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.betacom.ecommerce.dto.AccountDTO;
-import com.betacom.ecommerce.dto.SigninDTO;
-import com.betacom.ecommerce.requests.AccountReq;
-import com.betacom.ecommerce.requests.SigninReq;
+import com.betacom.ecommerce.dto.input.AccountReq;
+import com.betacom.ecommerce.dto.input.SigninReq;
+import com.betacom.ecommerce.dto.output.AccountDTO;
+import com.betacom.ecommerce.dto.output.SigninDTO;
 
 public interface IAccountServices {
 

@@ -1,4 +1,4 @@
-package com.betacom.ecommerce.requests;
+package com.betacom.ecommerce.dto.input;
 
 import lombok.Builder;
 import lombok.Getter;

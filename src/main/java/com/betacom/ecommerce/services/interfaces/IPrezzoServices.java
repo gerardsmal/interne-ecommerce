@@ -1,6 +1,6 @@
 package com.betacom.ecommerce.services.interfaces;
 
-import com.betacom.ecommerce.requests.PrezzoReq;
+import com.betacom.ecommerce.dto.input.PrezzoReq;
 
 public interface IPrezzoServices {
 

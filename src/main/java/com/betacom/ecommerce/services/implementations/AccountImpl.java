@@ -10,18 +10,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.betacom.ecommerce.dto.AccountDTO;
-import com.betacom.ecommerce.dto.CarelloDTO;
-import com.betacom.ecommerce.dto.CarelloRigaDTO;
-import com.betacom.ecommerce.dto.SigninDTO;
+import com.betacom.ecommerce.dto.input.AccountReq;
+import com.betacom.ecommerce.dto.input.SigninReq;
+import com.betacom.ecommerce.dto.output.AccountDTO;
+import com.betacom.ecommerce.dto.output.CarelloDTO;
+import com.betacom.ecommerce.dto.output.CarelloRigaDTO;
+import com.betacom.ecommerce.dto.output.SigninDTO;
 import com.betacom.ecommerce.enums.Role;
 import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Account;
 import com.betacom.ecommerce.models.Prezzo;
 import com.betacom.ecommerce.models.RigaCarello;
 import com.betacom.ecommerce.repositories.IAccountRepository;
-import com.betacom.ecommerce.requests.AccountReq;
-import com.betacom.ecommerce.requests.SigninReq;
 import com.betacom.ecommerce.services.interfaces.IAccountServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 
@@ -175,6 +175,7 @@ public class AccountImpl implements IAccountServices{
 		
 		return SigninDTO.builder()
 				.userID(user.getId())
+				.userName(user.getNome() + " " + user.getCognome())
 				.role(user.getRole().toString())
 				.build();
 	}

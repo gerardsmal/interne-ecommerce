@@ -2,9 +2,9 @@ package com.betacom.ecommerce.services.interfaces;
 
 import java.util.List;
 
-import com.betacom.ecommerce.dto.FamigliaDTO;
-import com.betacom.ecommerce.dto.ProdottoFamigliaDTO;
-import com.betacom.ecommerce.requests.FamigliaReq;
+import com.betacom.ecommerce.dto.input.FamigliaReq;
+import com.betacom.ecommerce.dto.output.FamigliaDTO;
+import com.betacom.ecommerce.dto.output.ProdottoFamigliaDTO;
 
 public interface IFamigliaServices {
 

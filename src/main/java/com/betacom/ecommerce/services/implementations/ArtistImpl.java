@@ -10,14 +10,14 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.betacom.ecommerce.dto.ArtistaDTO;
+import com.betacom.ecommerce.dto.input.ArtistReq;
+import com.betacom.ecommerce.dto.input.ChangeFamilyReq;
+import com.betacom.ecommerce.dto.output.ArtistaDTO;
 import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Artist;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.repositories.IArtistRepository;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
-import com.betacom.ecommerce.requests.ArtistReq;
-import com.betacom.ecommerce.requests.ChangeFamilyReq;
 import com.betacom.ecommerce.services.interfaces.IArtistServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;
 

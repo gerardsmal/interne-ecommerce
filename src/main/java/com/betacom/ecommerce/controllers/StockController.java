@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betacom.ecommerce.requests.StockReq;
+import com.betacom.ecommerce.dto.input.StockReq;
 import com.betacom.ecommerce.response.Response;
 import com.betacom.ecommerce.services.interfaces.IStockServices;
 import com.betacom.ecommerce.services.interfaces.IValidationServices;

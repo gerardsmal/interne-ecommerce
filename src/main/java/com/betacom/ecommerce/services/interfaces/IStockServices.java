@@ -1,7 +1,7 @@
 package com.betacom.ecommerce.services.interfaces;
 
-import com.betacom.ecommerce.requests.PickItemReq;
-import com.betacom.ecommerce.requests.StockReq;
+import com.betacom.ecommerce.dto.input.PickItemReq;
+import com.betacom.ecommerce.dto.input.StockReq;
 
 public interface IStockServices {
 

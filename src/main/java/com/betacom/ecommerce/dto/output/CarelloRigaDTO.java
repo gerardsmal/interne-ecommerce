@@ -1,4 +1,4 @@
-package com.betacom.ecommerce.dto;
+package com.betacom.ecommerce.dto.output;
 
 import java.time.LocalDate;
 

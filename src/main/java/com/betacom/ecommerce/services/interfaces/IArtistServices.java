@@ -2,9 +2,9 @@ package com.betacom.ecommerce.services.interfaces;
 
 import java.util.List;
 
-import com.betacom.ecommerce.dto.ArtistaDTO;
-import com.betacom.ecommerce.requests.ArtistReq;
-import com.betacom.ecommerce.requests.ChangeFamilyReq;
+import com.betacom.ecommerce.dto.input.ArtistReq;
+import com.betacom.ecommerce.dto.input.ChangeFamilyReq;
+import com.betacom.ecommerce.dto.output.ArtistaDTO;
 
 public interface IArtistServices {
 	void create(ArtistReq req) throws Exception;

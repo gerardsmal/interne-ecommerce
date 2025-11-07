@@ -1,7 +1,7 @@
 package com.betacom.ecommerce.services.interfaces;
 
-import com.betacom.ecommerce.requests.CarelloReq;
-import com.betacom.ecommerce.requests.RigaCarelloReq;
+import com.betacom.ecommerce.dto.input.CarelloReq;
+import com.betacom.ecommerce.dto.input.RigaCarelloReq;
 
 public interface ICarelloServices {
 

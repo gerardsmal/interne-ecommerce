@@ -1,6 +1,5 @@
-package com.betacom.ecommerce.dto;
+package com.betacom.ecommerce.dto.output;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import lombok.Builder;
@@ -10,11 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class OrderDTO {
+public class CarelloDTO {
 	private Integer id;
-	private LocalDate dataOrdine;
-	private LocalDate dataInvio;
 	private String status;
 	private double prezzoTotale;
-	List<OrderItemDTO> riga;
+	List<CarelloRigaDTO> riga;
 }
