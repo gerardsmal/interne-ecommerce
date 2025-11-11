@@ -51,8 +51,6 @@ public class AccountImpl implements IAccountServices{
 	public void create(AccountReq req) throws Exception {
 		log.debug("create:" + req);
 		
-		
-
 		validS.checkNotNull(req.getNome(), "account_no_nome");
 		validS.checkNotNull(req.getCognome(), "account_no_cognome");
 		
@@ -161,7 +159,28 @@ public class AccountImpl implements IAccountServices{
 
 		
 	}
+	
+	@Transactional (rollbackFor = Exception.class)
+	@Override
+	public void delete(Integer id) throws Exception {
+		log.debug("delete:" + id);
+		Account acc = accR.findById(id)
+				.map(ac -> ac.getOders() == null || ac.getOders().isEmpty()
+					? deleteAccount(ac)
+					: disableAccount(ac))						
+				.orElseThrow(() -> new Exception(validS.getMessaggio("account_ntfnd")));
 
+	}
+	
+	private Account deleteAccount(Account acc) {
+		accR.delete(acc);
+		return acc;
+	}
+
+	private Account disableAccount(Account acc) {
+		acc.setStatus(false);
+		return accR.save(acc);
+	}
 
 	@Override
 	public SigninDTO login(SigninReq req) throws Exception {
@@ -172,6 +191,8 @@ public class AccountImpl implements IAccountServices{
 		if (!encoder.matches(req.getPassword(), user.getPwd()))
 			throw new Exception(validS.getMessaggio("account_invalid"));
 		
+		if (!user.getStatus())
+			throw new Exception(validS.getMessaggio("account_disable"));
 		
 		return SigninDTO.builder()
 				.userID(user.getId())
@@ -252,6 +273,7 @@ public class AccountImpl implements IAccountServices{
 			return null;
 		}	
 	}
+
 
 
 }

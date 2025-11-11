@@ -64,10 +64,10 @@ public class FamigliaImpl  implements IFamigliaServices{
 	
 	@Transactional (rollbackFor = Exception.class)
 	@Override
-	public void delete(FamigliaReq req) throws Exception {
-		log.debug("Begin delete:" + req);
+	public void delete(Integer id) throws Exception {
+		log.debug("Begin delete:" + id);
 		
-		Famiglia fam = repoF.findById(req.getId())
+		Famiglia fam = repoF.findById(id)
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
 		try {
@@ -79,9 +79,14 @@ public class FamigliaImpl  implements IFamigliaServices{
 
 
 	@Override
-	public List<FamigliaDTO> list() throws Exception {
-		log.debug("Begin list");
-		List<Famiglia> lF = repoF.findAll();
+	public List<FamigliaDTO> list(String pattern) throws Exception {
+		log.debug("Begin list:" + pattern);
+		List<Famiglia> lF = null;
+
+		lF = (pattern == null || pattern.isBlank()) 
+				? repoF.findAll()
+				: repoF.findByDescrizioneContainingIgnoreCase(pattern);
+		
 		return lF.stream()
 				.map(f -> FamigliaDTO.builder()
 						.id(f.getId())

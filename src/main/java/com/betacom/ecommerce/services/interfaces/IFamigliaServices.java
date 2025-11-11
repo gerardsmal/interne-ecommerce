@@ -10,9 +10,9 @@ public interface IFamigliaServices {
 
 	void create(FamigliaReq req) throws Exception;
 	void update(FamigliaReq req) throws Exception;
-	void delete(FamigliaReq req) throws Exception;
+	void delete(Integer id) throws Exception;
 
-	List<FamigliaDTO> list() throws Exception;
+	List<FamigliaDTO> list(String pattern) throws Exception;
 	List<ProdottoFamigliaDTO> listPerFamiglia() throws Exception;
 	ProdottoFamigliaDTO ListByIdProdottoFamiglia(Integer id)  throws Exception;
 }

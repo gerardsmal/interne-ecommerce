@@ -74,7 +74,7 @@ public class Account {
 			  length = 50,
 			  unique = true)	
 	private String userName;
-	
+	 
 	@Column (name="password",
 			  nullable = false,
 			  length = 255)	

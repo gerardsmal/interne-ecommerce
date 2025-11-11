@@ -3,7 +3,9 @@ package com.betacom.ecommerce.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +63,20 @@ public class AccountController {
 	    return ResponseEntity.status(status).body(response);
 	}
 
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Response> delete(@PathVariable (required = true) Integer id) {
+	    HttpStatus status = HttpStatus.OK;
+	    Response response= new Response();
+	    try {
+	    	accS.delete(id);
+	    	response.setMsg(validS.getMessaggio("deleted"));
+	    } catch (Exception e) {
+	        status = HttpStatus.BAD_REQUEST;
+		    response.setMsg(e.getMessage());	    	        
+	    }
+	    return ResponseEntity.status(status).body(response);	    	
+
+	}
 	
 	@PostMapping("/login")
 	ResponseEntity<Object> login (@RequestBody (required = true) SigninReq req){

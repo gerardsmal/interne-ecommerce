@@ -1,9 +1,11 @@
 package com.betacom.ecommerce.controllers;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,12 +60,13 @@ public class FamigliaController {
 	}
 
 
-	@DeleteMapping("/delete")
-	public ResponseEntity<Response> delete(@RequestBody (required = true) FamigliaReq req) {
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Response> delete(@PathVariable (required = true) Integer id) {
+
 		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			famS.delete(req);
+			famS.delete(id);
 			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
 			r.setMsg(e.getMessage());
@@ -73,11 +76,11 @@ public class FamigliaController {
 	}
 	
 	@GetMapping("/list")
-	public ResponseEntity<Object> list(){
+	public ResponseEntity<Object> list(@RequestParam (required = false) String pattern){
 		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r=famS.list();
+			r=famS.list(pattern);
 		} catch (Exception e) {
 			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;
