@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,12 +58,12 @@ public class ArtistController {
 		return ResponseEntity.status(status).body(r);
 	}
 
-	@DeleteMapping("/delete")
-	public ResponseEntity<Response> delete(@RequestBody (required = true) ArtistReq req) {
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Response> delete(@PathVariable (required = true) Integer id) {
 		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			artS.remove(req);
+			artS.remove(id);
 			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
 			r.setMsg(e.getMessage());
@@ -73,12 +74,13 @@ public class ArtistController {
 
 	
 	
-	@DeleteMapping("/removeFamiglia")
-	public ResponseEntity<Response> removeFamiglia(@RequestBody (required = true) ArtistReq req) {
+	@DeleteMapping("/removeFamiglia/{id}/{famiglia}")
+	public ResponseEntity<Response> removeFamiglia(@PathVariable (required = true) Integer id, 
+				@PathVariable (required = true) Integer famiglia) {
 		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			artS.removeFamigliaArtist(req);
+			artS.removeFamigliaArtist(id, famiglia);
 			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
 			r.setMsg(e.getMessage());
@@ -116,11 +118,28 @@ public class ArtistController {
 	}
 
 	@GetMapping("/list")
-	public ResponseEntity<Object> list(){
+	public ResponseEntity<Object> list(
+			@RequestParam (required = false) String nome,
+			@RequestParam (required = false) Integer famiglia){
 		Object r = new Object();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			r= artS.list();
+			r= artS.list(nome, famiglia);
+		} catch (Exception e) {
+			r=e.getMessage();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return ResponseEntity.status(status).body(r);
+	}
+
+	@GetMapping("/listWeb")
+	public ResponseEntity<Object> listWeb(
+			@RequestParam (required = false) String nome,
+			@RequestParam (required = false) Integer famiglia){
+		Object r = new Object();
+		HttpStatus status = HttpStatus.OK;
+		try {
+			r= artS.listWeb(nome, famiglia);
 		} catch (Exception e) {
 			r=e.getMessage();
 			status = HttpStatus.BAD_REQUEST;

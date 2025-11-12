@@ -3,6 +3,7 @@ package com.betacom.ecommerce.services.implementations;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import com.betacom.ecommerce.dto.input.FamigliaReq;
 import com.betacom.ecommerce.dto.output.FamigliaDTO;
 import com.betacom.ecommerce.dto.output.ProdottoDTO;
 import com.betacom.ecommerce.dto.output.ProdottoFamigliaDTO;
+import com.betacom.ecommerce.exception.EcommerceException;
 import com.betacom.ecommerce.models.Famiglia;
 import com.betacom.ecommerce.models.Prodotto;
 import com.betacom.ecommerce.repositories.IFamigliaRepository;
@@ -36,7 +38,7 @@ public class FamigliaImpl  implements IFamigliaServices{
 	public void create(FamigliaReq req) throws Exception {
 		log.debug("Begin create:" + req);
 		
-		if (repoF.existsByDescrizione(req.getDescrizione().trim()))
+		if (repoF.existsByDescrizioneIgnoreCase(req.getDescrizione().trim()))
 			throw new Exception(msgS.getMessaggio("fam_fnd"));
 		
 		Famiglia f = new Famiglia();
@@ -57,6 +59,11 @@ public class FamigliaImpl  implements IFamigliaServices{
 		Optional.ofNullable(req.getDescrizione())
 			.map(String::trim)   // trim descrizione
 			.ifPresent(desc -> {
+				if (!desc.equalsIgnoreCase(fam.getDescrizione())) {
+					if (repoF.existsByDescrizioneIgnoreCase(desc))
+						throw new EcommerceException(msgS.getMessaggio("fam_fnd"));
+				}
+				
 				fam.setDescrizione(desc);
 				repoF.save(fam);
 			});		
@@ -70,11 +77,13 @@ public class FamigliaImpl  implements IFamigliaServices{
 		Famiglia fam = repoF.findById(id)
 				.orElseThrow(() -> new Exception(msgS.getMessaggio("fam_ntfnd")));
 		
-		try {
-			repoF.delete(fam);
-		} catch (Exception e) {
-			throw new Exception(msgS.getMessaggio("fam_children"));
-		}
+		boolean hasChildren = ((fam.getProdotto() != null) && !fam.getProdotto().isEmpty()) ||
+							  ((fam.getArtist() != null) && !fam.getArtist().isEmpty());	
+		
+		if (hasChildren)
+			throw new Exception(msgS.getMessaggio("fam_children"));	
+		
+		repoF.delete(fam);
 	}
 
 
@@ -84,8 +93,8 @@ public class FamigliaImpl  implements IFamigliaServices{
 		List<Famiglia> lF = null;
 
 		lF = (pattern == null || pattern.isBlank()) 
-				? repoF.findAll()
-				: repoF.findByDescrizioneContainingIgnoreCase(pattern);
+				? repoF.findAll(Sort.by("descrizione").ascending())
+				: repoF.findByDescrizioneContainingIgnoreCase(pattern,Sort.by("descrizione").ascending());
 		
 		return lF.stream()
 				.map(f -> FamigliaDTO.builder()
