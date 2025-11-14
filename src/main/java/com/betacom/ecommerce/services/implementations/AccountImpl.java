@@ -138,8 +138,9 @@ public class AccountImpl implements IAccountServices{
 		Optional.ofNullable(req.getPwd())
 			.ifPresent(pwd -> {
 				validS.validatePassword(pwd);	
-				acc.setTelefono(pwd);
+				acc.setPwd(encoder.encode(req.getPwd()));
 			});
+		
 		
 		if (req.getRole() != null) {
 			Role role = null;

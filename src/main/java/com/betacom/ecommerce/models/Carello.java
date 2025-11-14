@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.betacom.ecommerce.enums.StatoCarello;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,7 +48,8 @@ public class Carello {
 	
 	@OneToMany(
 			mappedBy = "carello",
-			fetch = FetchType.EAGER
+			fetch = FetchType.EAGER,
+			cascade = CascadeType.REMOVE
 			)
 	private  List<RigaCarello>  rigaCarello;
 }

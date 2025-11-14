@@ -72,8 +72,11 @@ public class ArtistImpl implements IArtistServices{
 		
 		Optional.ofNullable(req.getNome())
 			.ifPresent(nome -> {
-				if (artS.existsByNome(nome.trim()))
-					throw new EcommerceException(validS.getMessaggio("artist_fnd"));
+				if (!nome.equalsIgnoreCase(artist.getNome())) {
+					if (artS.existsByNome(nome.trim()))
+						throw new EcommerceException(validS.getMessaggio("artist_fnd"));
+					artist.setNome(nome);					
+				}
 			});
 	
 		// remove family if exist 
