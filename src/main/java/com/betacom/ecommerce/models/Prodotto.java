@@ -2,6 +2,7 @@ package com.betacom.ecommerce.models;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,7 +43,8 @@ public class Prodotto {
 	
 	@OneToMany(
 			mappedBy = "prodotto",
-			fetch = FetchType.EAGER)
+			fetch = FetchType.EAGER,
+			cascade = CascadeType.REMOVE)
 	
 	private List<Prezzo> prezzo;
 	

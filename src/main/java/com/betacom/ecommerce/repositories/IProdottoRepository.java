@@ -22,7 +22,7 @@ public interface IProdottoRepository extends JpaRepository<Prodotto, Integer>{
 	List<Prodotto> searchByFilter(
 			@Param("id") Integer id,
 			@Param("desc") String desc,
-			@Param("artist") String artist,
-			@Param("famiglia") String famiglia
+			@Param("artist") Integer artist,
+			@Param("famiglia") Integer famiglia
 			);
 }

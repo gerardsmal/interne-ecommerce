@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,13 +64,12 @@ public class ProdottoController {
 		 return ResponseEntity.status(status).body(r);
 	}
 	
-	
-	@DeleteMapping("/delete")
-	public ResponseEntity<Response> delete(@RequestBody (required = true) ProdottoReq req) {
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Response> delete(@PathVariable (required = true) Integer id) {
 		Response r = new Response();
 		HttpStatus status = HttpStatus.OK;
 		try {
-			prodS.delete(req);
+			prodS.delete(id);
 			r.setMsg(validS.getMessaggio("deleted"));
 		} catch (Exception e) {
 			r.setMsg(e.getMessage());
@@ -84,8 +84,8 @@ public class ProdottoController {
 	public  ResponseEntity<Object> list(
 			@RequestParam (required = false) Integer id,
 			@RequestParam (required = false) String desc,
-			@RequestParam (required = false) String artist,
-			@RequestParam (required = false) String famiglia
+			@RequestParam (required = false) Integer artist,
+			@RequestParam (required = false) Integer famiglia
 			){
 		
 		Object r = new Object();
@@ -98,4 +98,19 @@ public class ProdottoController {
 		}
 		return ResponseEntity.status(status).body(r);
 	}
+	
+	@GetMapping("/getById")
+	public  ResponseEntity<Object> getById(@RequestParam (required = true) Integer id){
+		
+		Object r = new Object();
+		HttpStatus status = HttpStatus.OK;
+		try {
+			r= prodS.getById(id);
+		} catch (Exception e) {
+			r= e.getMessage();
+			status= HttpStatus.BAD_REQUEST;
+		}
+		return ResponseEntity.status(status).body(r);
+	}
+	
 }

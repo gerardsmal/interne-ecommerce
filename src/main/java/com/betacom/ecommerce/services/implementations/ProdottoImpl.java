@@ -31,7 +31,7 @@ public class ProdottoImpl implements IProdottoServices{
 
 	private IProdottoRepository repP;
 	private IArtistRepository   artistR;
-	private IValidationServices   msgS;
+	private IValidationServices   validS;
 
 	
 	public ProdottoImpl(IProdottoRepository repP, 
@@ -40,7 +40,7 @@ public class ProdottoImpl implements IProdottoServices{
 			IValidationServices   msgS) {
 		this.repP = repP;
 		this.artistR = artistR;
-		this.msgS = msgS;
+		this.validS = msgS;
 	}
 
 
@@ -49,17 +49,17 @@ public class ProdottoImpl implements IProdottoServices{
 	public void create(ProdottoReq req) throws Exception {
 	
 		log.debug("Begin create:" + req);
-		msgS.checkNotNull(req.getDescrizione(), "prod_no_desc");
+		validS.checkNotNull(req.getDescrizione(), "prod_no_desc");
 
 		Optional<Prodotto> prod = repP.findByDescrizione(req.getDescrizione().trim());
 		if (prod.isPresent())
-			throw new Exception(msgS.getMessaggio("prod_fnd"));
+			throw new Exception(validS.getMessaggio("prod_fnd"));
 		
-		msgS.checkNotNull(req.getIdFamiglia(), "prod_no_famiglia");
-		msgS.checkNotNull(req.getIdArtist(), "prod_no_artist");
+		validS.checkNotNull(req.getIdFamiglia(), "prod_no_famiglia");
+		validS.checkNotNull(req.getIdArtist(), "prod_no_artist");
 		
 		Artist artist = artistR.findById(req.getIdArtist())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("artist_ntfnd")));
 	
 		Famiglia fam = controlFamiglia(artist.getFamiglia(), req.getIdFamiglia());
 		
@@ -77,13 +77,13 @@ public class ProdottoImpl implements IProdottoServices{
 	public void update(ProdottoReq req) throws Exception {
 		log.debug("Begin update:" + req);
 		Prodotto prod = repP.findById(req.getId())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
+				.orElseThrow(() -> new Exception(validS.getMessaggio("prod_ntfnd")));
 		
 		Optional.ofNullable(req.getDescrizione()).ifPresent(prod::setDescrizione);
 				
 		if (req.getIdArtist() != null) {
 			Artist artist = artistR.findById(req.getIdArtist())
-					.orElseThrow(() -> new Exception(msgS.getMessaggio("artist_ntfnd")));
+					.orElseThrow(() -> new Exception(validS.getMessaggio("artist_ntfnd")));
 			prod.setArtista(artist);			
 		}
 		
@@ -98,10 +98,13 @@ public class ProdottoImpl implements IProdottoServices{
 
 	@Transactional (rollbackFor = Exception.class)
 	@Override
-	public void delete(ProdottoReq req) throws Exception {
-		log.debug("Begin delete:" + req);
-		Prodotto prod = repP.findById(req.getId())
-				.orElseThrow(() -> new Exception(msgS.getMessaggio("prod_ntfnd")));
+	public void delete(Integer id) throws Exception {
+		log.debug("Begin delete:" + id);
+		Prodotto prod = repP.findById(id)
+				.orElseThrow(() -> new Exception(validS.getMessaggio("prod_ntfnd")));
+		
+		if (!prod.getRigaCarello().isEmpty())
+			throw new Exception(validS.getMessaggio("prod_carello_fnd"));
 		
 		repP.delete(prod);
 		
@@ -110,8 +113,9 @@ public class ProdottoImpl implements IProdottoServices{
 	
 
 	@Override
-	public List<ProdottoDTO> list(Integer id, String desc, String artist, String famiglia) throws Exception {
-		log.debug("list:" + id + "/" + desc);
+	public List<ProdottoDTO> list(Integer id, String desc, Integer artist, Integer famiglia) throws Exception {
+		if (desc != null) desc = desc.toUpperCase();
+		log.debug("list:" + id + "/" + desc + "/" + artist + "/" + famiglia);
 		List<Prodotto> lP = repP.searchByFilter(id, desc, artist, famiglia);
 		log.debug("prodotti trovati:" + lP.size());
 		return lP.stream()
@@ -135,6 +139,32 @@ public class ProdottoImpl implements IProdottoServices{
 				.toList();
 		
 	}
+	@Override
+	public ProdottoDTO getById(Integer id) throws Exception {
+		log.debug("getById:" + id);
+		
+		Prodotto p = repP.findById(id)
+				.orElseThrow(() -> new Exception(validS.getMessaggio("prod_ntfnd")));
+		
+		return ProdottoDTO.builder()
+				.id(p.getId())
+				.descrizione(p.getDescrizione())
+				.famiglia(FamigliaDTO.builder()
+						.id(p.getFamiglia().getId())
+						.descrizione(p.getFamiglia().getDescrizione())
+						.build())
+				.artista(ArtistaDTO.builder()
+						.id(p.getArtista().getId())
+						.nome(p.getArtista().getNome())
+						.famiglia(buildFamigliaDTOList(p.getArtista().getFamiglia()))
+						.build()
+						)
+				.prezzo(buildPrezzoDTOList(p.getPrezzo()))
+				.build();
+				
+	}
+
+	
 	
 	/*
 	 * control family validity
@@ -144,9 +174,11 @@ public class ProdottoImpl implements IProdottoServices{
 		Famiglia fam = lF.stream()
 			    .filter(f -> f.getId() == idFamiglia)
 			    .findFirst()
-			    .orElseThrow(() -> new EcommerceException(msgS.getMessaggio("prod_fam.incomp")));
+			    .orElseThrow(() -> new EcommerceException(validS.getMessaggio("prod_fam.incomp")));
 		return fam;
 	}
+
+
 	
 
 }
